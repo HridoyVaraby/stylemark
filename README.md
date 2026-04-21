@@ -1,73 +1,57 @@
-# React + TypeScript + Vite
+# StyleMark
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+StyleMark is a purely client-side visual design system configurator. It bridges the gap between non-technical clients and developers by providing an interactive UI to define design tokens (colors, typography, geometry) and exporting a highly structured Markdown file which serves as a definitive "Source of Truth" for developers and AI agents.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Zero-Backend:** Fully client-side application.
+- **Split-Pane Layout:**
+  - **Control Center:** Define colors, typography, and geometry.
+  - **Preview Dashboard:** Real-time preview of the theme.
+- **Export Engine:** Transforms state into a deterministic Markdown file prompt for development use.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Framework:** React 19 powered by Vite
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS (v3) combined with Shadcn UI (Radix UI primitives)
+- **Icons:** Lucide-react
+- **State Management:** Zustand (with localStorage persistence)
+- **Package Manager:** pnpm
 
-## Expanding the ESLint configuration
+## Building and Running
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Make sure Node.js v22 is installed. The project relies on `pnpm`.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1. **Install Dependencies:**
+   ```bash
+   pnpm install
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+2. **Development Server:**
+   ```bash
+   pnpm dev
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+3. **Production Build:**
+   ```bash
+   pnpm build
+   ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+4. **Linting:**
+   ```bash
+   pnpm lint
+   ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+5. **Preview Production Build:**
+   ```bash
+   pnpm preview
+   ```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Development Conventions
+
+- **State Management:** All global design tokens reside in the `useThemeStore` Zustand store. Do not manage theme state via local component state.
+- **Styling:** Use Tailwind CSS utility classes and `cn` utility for conditional classes. Follow Shadcn UI component structures.
+- **Type Safety:** Strict TypeScript adherence is required. Avoid `any` types.
+- **Code Quality:** All code should pass `pnpm lint` without errors before committing.
+- **Component Placement:** Shared/reusable UI components belong in `src/components/ui`. Functional layout panes (like `ControlCenter.tsx` and `PreviewDashboard.tsx`) belong directly in `src/components`.
