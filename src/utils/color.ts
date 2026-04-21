@@ -8,12 +8,12 @@ export function hexToHsl(hex: string): string {
   const b = parseInt(hex.substring(4, 6), 16) / 255
 
   // Find greatest and smallest channel values
-  const cmin = Math.min(r, g, b),
-      cmax = Math.max(r, g, b),
-      delta = cmax - cmin
-  let h = 0,
-      s = 0,
-      l = 0
+  const cmin = Math.min(r, g, b)
+  const cmax = Math.max(r, g, b)
+  const delta = cmax - cmin
+  let h = 0
+  let s = 0
+  let l = 0
 
   // Calculate hue
   if (delta === 0) h = 0
