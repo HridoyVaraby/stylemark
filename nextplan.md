@@ -23,7 +23,7 @@ This plan builds upon the achievements of the initial improvement phases, moving
     *   Introduce an "AI Prompt" input field in the Control Center.
     *   Allow users to type prompts like "Create a cyberpunk theme with high contrast" and use an API (e.g., OpenAI, Anthropic, or local Web-LLM) to translate that natural language into the specific JSON schema required by the Zustand store, instantly applying the theme.
 2.  **Direct Agent Integrations (Hooks):**
-    *   Create a local API endpoint or a structured clipboard format specifically tailored for direct ingestion by agents like cursor or GitHub Copilot, bypassing the manual markdown download step where possible.
+    *   Create a local API endpoint or a structured clipboard format specifically tailored for direct ingestion by agents like Cursor or GitHub Copilot, bypassing the manual markdown download step where possible.
 3.  **Semantic Image Analysis (Theme Extraction):**
     *   Allow users to drag-and-drop an image (e.g., a logo or an inspiration board).
     *   Implement client-side color extraction (using libraries like `color-thief`) to automatically populate the primary, secondary, and accent colors, mapping them intelligently to the Shadcn semantic token system.
