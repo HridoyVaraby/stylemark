@@ -8,7 +8,7 @@ This plan builds upon the achievements of the initial improvement phases, moving
 *Current limitation: Configurations can only be shared via manual JSON file export/import or Markdown files, hindering asynchronous collaboration.*
 
 1.  **URL-Based State Encoding:**
-    *   Implement base64 encoding (e.g., LZ-string compression) to serialize the entire Zustand `useThemeStore` state into the URL hash or query parameters.
+    *   Implement URL-safe compression (e.g., using `lz-string`'s `compressToEncodedURIComponent`) to serialize the entire Zustand `useThemeStore` state into the URL hash or query parameters.
     *   Enable users to share a unique URL that automatically hydrates the exact design token state upon opening, facilitating instant feedback loops without a database.
 2.  **QR Code Generation:**
     *   Provide a "Share via QR Code" feature alongside the URL to allow designers and clients to quickly preview the generated theme on actual mobile devices.
