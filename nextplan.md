@@ -14,7 +14,7 @@ This plan builds upon the achievements of the initial improvement phases, moving
     *   Provide a "Share via QR Code" feature alongside the URL to allow designers and clients to quickly preview the generated theme on actual mobile devices.
 3.  **Local History & Rollbacks:**
     *   Implement an undo/redo stack for design decisions within the current session.
-    *   Save discrete versions in `localStorage` allowing users to revert to a "saved state" from 10 minutes ago if a design exploration goes off track.
+    *   Save discrete versions in `localStorage` or `sessionStorage` allowing users to revert to a previous state if a design exploration goes off track.
 
 ## Phase 6: AI-Native Capabilities & Integrations
 *Current limitation: The exported Markdown acts as an AI prompt, but the tool itself is static and isolated from the AI generation process.*
