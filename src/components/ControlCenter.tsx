@@ -14,6 +14,16 @@ const GOOGLE_FONTS = ['Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Pop
 export function ControlCenter() {
   const store = useThemeStore()
 
+  const downloadBlob = (content: string, filename: string, mime: string) => {
+    const blob = new Blob([content], { type: mime })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const handleExportJson = () => {
     const state = useThemeStore.getState()
     const data = { ...state } as Record<string, unknown>
@@ -25,48 +35,14 @@ export function ControlCenter() {
     delete data.setEffects
     delete data.applyPreset
     delete data.loadState
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${store.meta.projectName || 'stylemark'}-session.json`
-    a.click()
-    URL.revokeObjectURL(url)
+    downloadBlob(JSON.stringify(data, null, 2), `${store.meta.projectName || 'stylemark'}-session.json`, 'application/json')
   }
 
-  const handleExportMarkdown = () => {
-    const md = generateMarkdown(useThemeStore.getState())
-    const blob = new Blob([md], { type: 'text/markdown' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${store.meta.projectName || 'stylemark'}-StyleMark.md`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
+  const handleExportMarkdown = () => downloadBlob(generateMarkdown(useThemeStore.getState()), `${store.meta.projectName || 'stylemark'}-StyleMark.md`, 'text/markdown')
 
-  const handleExportCss = () => {
-    const css = generateCss(useThemeStore.getState())
-    const blob = new Blob([css], { type: 'text/css' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'globals.css'
-    a.click()
-    URL.revokeObjectURL(url)
-  }
+  const handleExportCss = () => downloadBlob(generateCss(useThemeStore.getState()), 'globals.css', 'text/css')
 
-  const handleExportTailwindConfig = () => {
-    const js = generateTailwindConfig(useThemeStore.getState())
-    const blob = new Blob([js], { type: 'application/javascript' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'tailwind.config.js'
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
+  const handleExportTailwindConfig = () => downloadBlob(generateTailwindConfig(useThemeStore.getState()), 'tailwind.config.js', 'application/javascript')
   const applyVibe = (vibe: 'luxury' | 'saas' | 'playful') => {
     const presets = {
       luxury: {
@@ -80,7 +56,7 @@ export function ControlCenter() {
       saas: {
         meta: { baseTheme: 'light' as const, projectName: store.meta.projectName },
         lightColors: { ...store.lightColors, primary: '#2563eb', secondary: '#f1f5f9', accent: '#3b82f6', background: '#ffffff', foreground: '#0f172a', success: '#10b981', warning: '#f59e0b', destructive: '#ef4444' },
-        darkColors: { ...store.darkColors, primary: '#2563eb', secondary: '#f1f5f9', accent: '#3b82f6', background: '#ffffff', foreground: '#0f172a', success: '#10b981', warning: '#f59e0b', destructive: '#ef4444' },
+        darkColors: { ...store.darkColors, primary: '#3b82f6', secondary: '#1e293b', accent: '#2563eb', background: '#020817', foreground: '#f8fafc', success: '#10b981', warning: '#f59e0b', destructive: '#ef4444' },
         typography: { headingFont: 'Inter', bodyFont: 'Inter', baseSize: 1, letterSpacing: 0, lineHeight: 1.5 },
         geometry: { radius: '0.375rem', borderThickness: 1 },
         effects: { shadowDepth: 'elevated' as const, transitionEasing: 'ease-out' as const }
@@ -88,7 +64,7 @@ export function ControlCenter() {
       playful: {
         meta: { baseTheme: 'light' as const, projectName: store.meta.projectName },
         lightColors: { ...store.lightColors, primary: '#ec4899', secondary: '#fdf2f8', accent: '#8b5cf6', background: '#ffffff', foreground: '#111827', success: '#10b981', warning: '#f59e0b', destructive: '#ef4444' },
-        darkColors: { ...store.darkColors, primary: '#ec4899', secondary: '#fdf2f8', accent: '#8b5cf6', background: '#ffffff', foreground: '#111827', success: '#10b981', warning: '#f59e0b', destructive: '#ef4444' },
+        darkColors: { ...store.darkColors, primary: '#f472b6', secondary: '#4c1d95', accent: '#a78bfa', background: '#030712', foreground: '#f9fafb', success: '#10b981', warning: '#f59e0b', destructive: '#ef4444' },
         typography: { headingFont: 'Poppins', bodyFont: 'Poppins', baseSize: 1.125, letterSpacing: 0, lineHeight: 1.5 },
         geometry: { radius: '9999px', borderThickness: 2 },
         effects: { shadowDepth: 'floating' as const, transitionEasing: 'spring' as const }
@@ -117,6 +93,7 @@ export function ControlCenter() {
             <Select value={store.meta.baseTheme} onValueChange={(v: 'light' | 'dark' | 'system') => store.setMeta({ baseTheme: v })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
+                    <SelectItem value="system">System</SelectItem>
                 <SelectItem value="light">Light</SelectItem>
                 <SelectItem value="dark">Dark</SelectItem>
               </SelectContent>

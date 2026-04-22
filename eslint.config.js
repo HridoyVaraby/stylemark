@@ -20,6 +20,17 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
+      'react-refresh/only-export-components': [
+        'warn',
+        {
+          allowConstantExport: true
+        }
+      ],
+    },
+  },
+  {
+    files: ['src/components/ui/**/*.tsx'],
+    rules: {
       'react-refresh/only-export-components': 'off',
     },
   },
