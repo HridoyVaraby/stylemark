@@ -7,6 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table'
 import { Laptop, Smartphone, Tablet, Moon, Sun } from 'lucide-react'
+import { Badge } from './ui/badge'
+import { Alert, AlertDescription, AlertTitle } from './ui/alert'
+import { Switch } from './ui/switch'
+import { Label } from './ui/label'
 
 export function PreviewDashboard() {
   const store = useThemeStore()
@@ -20,13 +24,33 @@ export function PreviewDashboard() {
   }, [store.meta.baseTheme])
 
   // Inject CSS Variables
+  const activeColors = isDark ? store.darkColors : store.lightColors;
   const styleVariables = {
-    '--primary': hexToHsl(store.colors.primary),
-    '--secondary': hexToHsl(store.colors.secondary),
-    '--accent': hexToHsl(store.colors.accent),
-    '--background': hexToHsl(store.colors.background),
-    '--foreground': hexToHsl(store.colors.foreground),
-    '--destructive': hexToHsl(store.colors.destructive),
+    '--background': hexToHsl(activeColors.background),
+    '--foreground': hexToHsl(activeColors.foreground),
+    '--card': hexToHsl(activeColors.card),
+    '--card-foreground': hexToHsl(activeColors.cardForeground),
+    '--popover': hexToHsl(activeColors.popover),
+    '--popover-foreground': hexToHsl(activeColors.popoverForeground),
+    '--primary': hexToHsl(activeColors.primary),
+    '--primary-foreground': hexToHsl(activeColors.primaryForeground),
+    '--secondary': hexToHsl(activeColors.secondary),
+    '--secondary-foreground': hexToHsl(activeColors.secondaryForeground),
+    '--muted': hexToHsl(activeColors.muted),
+    '--muted-foreground': hexToHsl(activeColors.mutedForeground),
+    '--accent': hexToHsl(activeColors.accent),
+    '--accent-foreground': hexToHsl(activeColors.accentForeground),
+    '--destructive': hexToHsl(activeColors.destructive),
+    '--destructive-foreground': hexToHsl(activeColors.destructiveForeground),
+    '--border': hexToHsl(activeColors.border),
+    '--input': hexToHsl(activeColors.input),
+    '--ring': hexToHsl(activeColors.ring),
+    '--success': hexToHsl(activeColors.success),
+    letterSpacing: `${store.typography.letterSpacing}em`,
+    lineHeight: `${store.typography.lineHeight}`,
+    '--success-foreground': hexToHsl(activeColors.successForeground),
+    '--warning': hexToHsl(activeColors.warning),
+    '--warning-foreground': hexToHsl(activeColors.warningForeground),
     '--radius': store.geometry.radius,
     '--font-heading': `"${store.typography.headingFont}", sans-serif`,
     '--font-body': `"${store.typography.bodyFont}", sans-serif`,
@@ -88,7 +112,7 @@ export function PreviewDashboard() {
           <div className="p-8 space-y-8" style={{ fontFamily: 'var(--font-body)' }}>
             <header className="flex justify-between items-center mb-12">
               <div>
-                <h1 style={{ fontFamily: 'var(--font-heading)' }} className="text-4xl font-bold tracking-tight">
+                <h1 style={{ fontFamily: 'var(--font-heading)', letterSpacing: `${store.typography.letterSpacing}em`, lineHeight: store.typography.lineHeight }} className="text-4xl font-bold">
                   {store.meta.projectName || 'Welcome to StyleMark'}
                 </h1>
                 <p className="text-muted-foreground text-lg mt-2">
@@ -105,6 +129,7 @@ export function PreviewDashboard() {
               <TabsList className="mb-4">
                 <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                 <TabsTrigger value="components">Components</TabsTrigger>
+                <TabsTrigger value="typography">Typography</TabsTrigger>
               </TabsList>
               
               <TabsContent value="dashboard" className="space-y-6">
@@ -165,6 +190,42 @@ export function PreviewDashboard() {
                     </Table>
                   </CardContent>
                 </Card>
+
+                <div className="space-y-4">
+                  <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-xl font-semibold">Badges</h3>
+                  <div className="flex flex-wrap gap-4">
+                    <Badge>Default</Badge>
+                    <Badge variant="secondary">Secondary</Badge>
+                    <Badge variant="outline">Outline</Badge>
+                    <Badge variant="destructive">Destructive</Badge>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-xl font-semibold">Alerts</h3>
+                  <div className="grid gap-4 max-w-md">
+                    <Alert>
+                      <AlertTitle>Default Alert</AlertTitle>
+                      <AlertDescription>
+                        This is a standard alert message without special styling.
+                      </AlertDescription>
+                    </Alert>
+                    <Alert variant="destructive">
+                      <AlertTitle>Destructive Alert</AlertTitle>
+                      <AlertDescription>
+                        This indicates a critical error or destructive action warning.
+                      </AlertDescription>
+                    </Alert>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-xl font-semibold">Toggles</h3>
+                  <div className="flex items-center space-x-2">
+                    <Switch id="airplane-mode-components" />
+                    <Label htmlFor="airplane-mode-components">Airplane Mode</Label>
+                  </div>
+                </div>
               </TabsContent>
 
               <TabsContent value="components" className="space-y-8 max-w-2xl">
@@ -186,6 +247,93 @@ export function PreviewDashboard() {
                     <Input defaultValue="Filled input" />
                     <Input disabled placeholder="Disabled input" />
                   </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-xl font-semibold">Badges</h3>
+                  <div className="flex flex-wrap gap-4">
+                    <Badge>Default</Badge>
+                    <Badge variant="secondary">Secondary</Badge>
+                    <Badge variant="outline">Outline</Badge>
+                    <Badge variant="destructive">Destructive</Badge>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-xl font-semibold">Alerts</h3>
+                  <div className="grid gap-4 max-w-md">
+                    <Alert>
+                      <AlertTitle>Default Alert</AlertTitle>
+                      <AlertDescription>
+                        This is a standard alert message without special styling.
+                      </AlertDescription>
+                    </Alert>
+                    <Alert variant="destructive">
+                      <AlertTitle>Destructive Alert</AlertTitle>
+                      <AlertDescription>
+                        This indicates a critical error or destructive action warning.
+                      </AlertDescription>
+                    </Alert>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-xl font-semibold">Toggles</h3>
+                  <div className="flex items-center space-x-2">
+                    <Switch id="airplane-mode" />
+                    <Label htmlFor="airplane-mode">Airplane Mode</Label>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="typography" className="space-y-8 max-w-3xl">
+                <div className="space-y-4">
+                  <div className="grid gap-1 border-b pb-4">
+                    <h1 style={{ fontFamily: 'var(--font-heading)', letterSpacing: `${store.typography.letterSpacing}em`, lineHeight: store.typography.lineHeight }} className="text-4xl font-extrabold lg:text-5xl">
+                      Heading 1: The quick brown fox
+                    </h1>
+                    <p className="text-sm text-muted-foreground font-mono">4rem / var(--font-heading) / 800</p>
+                  </div>
+
+                  <div className="grid gap-1 border-b pb-4">
+                    <h2 style={{ fontFamily: 'var(--font-heading)', letterSpacing: `${store.typography.letterSpacing}em`, lineHeight: store.typography.lineHeight }} className="text-3xl font-semibold transition-colors first:mt-0">
+                      Heading 2: Jumps over the lazy dog
+                    </h2>
+                    <p className="text-sm text-muted-foreground font-mono">3rem / var(--font-heading) / 600</p>
+                  </div>
+
+                  <div className="grid gap-1 border-b pb-4">
+                    <h3 style={{ fontFamily: 'var(--font-heading)', letterSpacing: `${store.typography.letterSpacing}em`, lineHeight: store.typography.lineHeight }} className="text-2xl font-semibold">
+                      Heading 3: Pack my box with five dozen liquor jugs
+                    </h3>
+                    <p className="text-sm text-muted-foreground font-mono">2rem / var(--font-heading) / 600</p>
+                  </div>
+
+                  <div className="grid gap-1 border-b pb-4">
+                    <h4 style={{ fontFamily: 'var(--font-heading)', letterSpacing: `${store.typography.letterSpacing}em`, lineHeight: store.typography.lineHeight }} className="text-xl font-semibold">
+                      Heading 4: How vexingly quick daft zebras jump
+                    </h4>
+                    <p className="text-sm text-muted-foreground font-mono">1.5rem / var(--font-heading) / 600</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="grid gap-2">
+                    <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-xl font-semibold">Body Text</h3>
+                    <p style={{ lineHeight: store.typography.lineHeight }} className="[&:not(:first-child)]:mt-6">
+                      The king, seeing how much mother and daughter suffered, resolved to free them from this persecution. He ordered his soldiers to capture the dwarf, but the little man was so quick and cunning that he always managed to escape.
+                    </p>
+                    <p style={{ lineHeight: store.typography.lineHeight }} className="[&:not(:first-child)]:mt-6">
+                      One day, the princess was walking in the garden when the dwarf appeared before her. "I have a proposition for you," he said. "If you can guess my name, I will leave you and your mother in peace. But if you fail, you must marry me."
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-xl font-semibold">Blockquote</h3>
+                  <blockquote className="mt-6 border-l-2 pl-6 italic">
+                    "After all," he said, "everyone enjoys a good joke, so it's only fair that they should pay for a good joke."
+                  </blockquote>
                 </div>
               </TabsContent>
             </Tabs>

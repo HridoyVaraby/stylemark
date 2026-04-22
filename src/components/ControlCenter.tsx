@@ -5,6 +5,8 @@ import { Button } from './ui/button'
 import { Slider } from './ui/slider'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { generateMarkdown } from '@/utils/generateMarkdown'
+import { generateCss } from '@/utils/generateCss'
+import { generateTailwindConfig } from '@/utils/generateTailwindConfig'
 import { Download, Upload } from 'lucide-react'
 
 const GOOGLE_FONTS = ['Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Poppins', 'Playfair Display']
@@ -12,56 +14,58 @@ const GOOGLE_FONTS = ['Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Pop
 export function ControlCenter() {
   const store = useThemeStore()
 
+  const downloadBlob = (content: string, filename: string, mime: string) => {
+    const blob = new Blob([content], { type: mime })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const handleExportJson = () => {
     const state = useThemeStore.getState()
     const data = { ...state } as Record<string, unknown>
     delete data.setMeta
-    delete data.setColors
+    delete data.setLightColors
+    delete data.setDarkColors
     delete data.setTypography
     delete data.setGeometry
     delete data.setEffects
     delete data.applyPreset
     delete data.loadState
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${store.meta.projectName || 'stylemark'}-session.json`
-    a.click()
-    URL.revokeObjectURL(url)
+    downloadBlob(JSON.stringify(data, null, 2), `${store.meta.projectName || 'stylemark'}-session.json`, 'application/json')
   }
 
-  const handleExportMarkdown = () => {
-    const md = generateMarkdown(useThemeStore.getState())
-    const blob = new Blob([md], { type: 'text/markdown' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${store.meta.projectName || 'stylemark'}-StyleMark.md`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
+  const handleExportMarkdown = () => downloadBlob(generateMarkdown(useThemeStore.getState()), `${store.meta.projectName || 'stylemark'}-StyleMark.md`, 'text/markdown')
 
+  const handleExportCss = () => downloadBlob(generateCss(useThemeStore.getState()), 'globals.css', 'text/css')
+
+  const handleExportTailwindConfig = () => downloadBlob(generateTailwindConfig(useThemeStore.getState()), 'tailwind.config.js', 'application/javascript')
   const applyVibe = (vibe: 'luxury' | 'saas' | 'playful') => {
     const presets = {
       luxury: {
         meta: { baseTheme: 'dark' as const, projectName: store.meta.projectName },
-        colors: { primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', success: '#2e8b57', warning: '#d2691e', destructive: '#8b0000' },
-        typography: { headingFont: 'Playfair Display', bodyFont: 'Lato', baseSize: 1 },
+        lightColors: { ...store.lightColors, primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', destructive: '#8b0000' },
+        darkColors: { ...store.darkColors, primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', destructive: '#8b0000' },
+        typography: { headingFont: 'Playfair Display', bodyFont: 'Lato', baseSize: 1, letterSpacing: 0, lineHeight: 1.5 },
         geometry: { radius: '0rem', borderThickness: 1 },
         effects: { shadowDepth: 'flat' as const, transitionEasing: 'ease-in-out' as const }
       },
       saas: {
         meta: { baseTheme: 'light' as const, projectName: store.meta.projectName },
-        colors: { primary: '#2563eb', secondary: '#f1f5f9', accent: '#3b82f6', background: '#ffffff', foreground: '#0f172a', success: '#10b981', warning: '#f59e0b', destructive: '#ef4444' },
-        typography: { headingFont: 'Inter', bodyFont: 'Inter', baseSize: 1 },
+        lightColors: { ...store.lightColors, primary: '#2563eb', secondary: '#f1f5f9', accent: '#3b82f6', background: '#ffffff', foreground: '#0f172a', destructive: '#ef4444' },
+        darkColors: { ...store.darkColors, primary: '#3b82f6', secondary: '#1e293b', accent: '#2563eb', background: '#020817', foreground: '#f8fafc', destructive: '#ef4444' },
+        typography: { headingFont: 'Inter', bodyFont: 'Inter', baseSize: 1, letterSpacing: 0, lineHeight: 1.5 },
         geometry: { radius: '0.375rem', borderThickness: 1 },
         effects: { shadowDepth: 'elevated' as const, transitionEasing: 'ease-out' as const }
       },
       playful: {
         meta: { baseTheme: 'light' as const, projectName: store.meta.projectName },
-        colors: { primary: '#ec4899', secondary: '#fdf2f8', accent: '#8b5cf6', background: '#ffffff', foreground: '#111827', success: '#10b981', warning: '#f59e0b', destructive: '#ef4444' },
-        typography: { headingFont: 'Poppins', bodyFont: 'Poppins', baseSize: 1.125 },
+        lightColors: { ...store.lightColors, primary: '#ec4899', secondary: '#fdf2f8', accent: '#8b5cf6', background: '#ffffff', foreground: '#111827', destructive: '#ef4444' },
+        darkColors: { ...store.darkColors, primary: '#f472b6', secondary: '#4c1d95', accent: '#a78bfa', background: '#030712', foreground: '#f9fafb', destructive: '#ef4444' },
+        typography: { headingFont: 'Poppins', bodyFont: 'Poppins', baseSize: 1.125, letterSpacing: 0, lineHeight: 1.5 },
         geometry: { radius: '9999px', borderThickness: 2 },
         effects: { shadowDepth: 'floating' as const, transitionEasing: 'spring' as const }
       }
@@ -89,6 +93,7 @@ export function ControlCenter() {
             <Select value={store.meta.baseTheme} onValueChange={(v: 'light' | 'dark' | 'system') => store.setMeta({ baseTheme: v })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
+                    <SelectItem value="system">System</SelectItem>
                 <SelectItem value="light">Light</SelectItem>
                 <SelectItem value="dark">Dark</SelectItem>
               </SelectContent>
@@ -109,20 +114,23 @@ export function ControlCenter() {
         {/* Color System */}
         <section className="space-y-4">
           <h2 className="font-semibold">Color System</h2>
-          {Object.entries(store.colors).map(([key, val]) => (
+          {Object.entries(store.meta.baseTheme === 'dark' ? store.darkColors : store.lightColors).map(([key, val]) => {
+            if (key.endsWith('Foreground')) return null;
+            return (
             <div key={key} className="flex items-center gap-4">
               <input
                 type="color"
                 className="w-10 h-10 p-0 border-0 rounded cursor-pointer shrink-0"
-                value={val}
-                onChange={(e) => store.setColors({ [key]: e.target.value })}
+                value={val as string}
+                onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ [key]: e.target.value }) : store.setLightColors({ [key]: e.target.value })}
               />
               <div className="flex-1">
                 <Label className="capitalize">{key}</Label>
-                <Input value={val} onChange={(e) => store.setColors({ [key]: e.target.value })} className="font-mono text-sm mt-1" />
+                <Input value={val as string} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ [key]: e.target.value }) : store.setLightColors({ [key]: e.target.value })} className="font-mono text-sm mt-1" />
               </div>
             </div>
-          ))}
+            )
+          })}
         </section>
 
         {/* Typography */}
@@ -154,6 +162,26 @@ export function ControlCenter() {
               value={[store.typography.baseSize]}
               min={0.75} max={1.5} step={0.0625}
               onValueChange={([v]) => store.setTypography({ baseSize: v })}
+            />
+          </div>
+          <div className="space-y-4 pt-2">
+            <div className="flex justify-between">
+              <Label>Letter Spacing ({store.typography.letterSpacing}em)</Label>
+            </div>
+            <Slider
+              value={[store.typography.letterSpacing]}
+              min={-0.1} max={0.2} step={0.01}
+              onValueChange={([v]) => store.setTypography({ letterSpacing: v })}
+            />
+          </div>
+          <div className="space-y-4 pt-2">
+            <div className="flex justify-between">
+              <Label>Line Height ({store.typography.lineHeight})</Label>
+            </div>
+            <Slider
+              value={[store.typography.lineHeight]}
+              min={1} max={2} step={0.05}
+              onValueChange={([v]) => store.setTypography({ lineHeight: v })}
             />
           </div>
         </section>
@@ -230,9 +258,17 @@ export function ControlCenter() {
             }}
           />
         </div>
-        <Button className="w-full" onClick={handleExportMarkdown}>
-          Generate StyleMark
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" className="flex-1" onClick={handleExportCss}>
+            CSS
+          </Button>
+          <Button variant="outline" className="flex-1" onClick={handleExportTailwindConfig}>
+            Tailwind
+          </Button>
+          <Button className="flex-1" onClick={handleExportMarkdown}>
+            Markdown
+          </Button>
+        </div>
       </div>
     </div>
   )
