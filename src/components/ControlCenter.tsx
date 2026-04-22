@@ -1,3 +1,8 @@
+import { useState } from "react"
+import LZString from 'lz-string'
+import { QRCodeSVG } from 'qrcode.react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { useStore } from 'zustand'
 import { useThemeStore } from '@/store/useThemeStore'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
@@ -7,11 +12,44 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { generateMarkdown } from '@/utils/generateMarkdown'
 import { generateCss } from '@/utils/generateCss'
 import { generateTailwindConfig } from '@/utils/generateTailwindConfig'
-import { Download, Upload } from 'lucide-react'
+import { Download, Upload, Share2, Copy, Check, Undo, Redo } from 'lucide-react'
 
 const GOOGLE_FONTS = ['Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Poppins', 'Playfair Display']
 
 export function ControlCenter() {
+
+  const pastStates = useStore(useThemeStore.temporal, (state) => state.pastStates)
+  const futureStates = useStore(useThemeStore.temporal, (state) => state.futureStates)
+  const undo = () => useThemeStore.temporal.getState().undo()
+  const redo = () => useThemeStore.temporal.getState().redo()
+
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
+  const [shareUrl, setShareUrl] = useState('')
+  const [copied, setCopied] = useState(false)
+
+  const handleShare = () => {
+    const stateToShare = {
+      meta: store.meta,
+      lightColors: store.lightColors,
+      darkColors: store.darkColors,
+      typography: store.typography,
+      geometry: store.geometry,
+      effects: store.effects
+    }
+    const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(stateToShare))
+    const url = new URL(window.location.href)
+    url.searchParams.set('theme', compressed)
+
+    setShareUrl(url.toString())
+    setIsShareDialogOpen(true)
+    setCopied(false)
+  }
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(shareUrl)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
   const store = useThemeStore()
 
   const downloadBlob = (content: string, filename: string, mime: string) => {
@@ -78,6 +116,14 @@ export function ControlCenter() {
       <div className="p-6 border-b">
         <h1 className="text-2xl font-bold tracking-tight mb-1">StyleMark</h1>
         <p className="text-sm text-muted-foreground">Design System Configurator</p>
+        <div className="flex gap-2 mt-4">
+          <Button variant="outline" size="sm" onClick={undo} disabled={pastStates.length === 0}>
+            <Undo className="w-4 h-4 mr-2" /> Undo
+          </Button>
+          <Button variant="outline" size="sm" onClick={redo} disabled={futureStates.length === 0}>
+            <Redo className="w-4 h-4 mr-2" /> Redo
+          </Button>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-8">
@@ -229,6 +275,9 @@ export function ControlCenter() {
 
       <div className="p-6 border-t bg-background space-y-4">
         <div className="flex gap-2">
+          <Button variant="outline" className="w-full" onClick={handleShare}>
+            <Share2 className="w-4 h-4 mr-2" /> Share
+          </Button>
           <Button variant="outline" className="w-full" onClick={handleExportJson}>
             <Download className="w-4 h-4 mr-2" /> Session
           </Button>
@@ -270,6 +319,32 @@ export function ControlCenter() {
           </Button>
         </div>
       </div>
+
+      <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Share Theme</DialogTitle>
+            <DialogDescription>
+              Anyone with this link will see your exact theme configuration.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center space-y-4 py-4">
+            <div className="bg-white p-4 rounded-lg">
+              <QRCodeSVG value={shareUrl} size={200} />
+            </div>
+            <div className="flex w-full items-center space-x-2">
+              <Input
+                readOnly
+                value={shareUrl}
+                className="flex-1"
+              />
+              <Button type="button" size="sm" className="px-3" onClick={copyToClipboard}>
+                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
