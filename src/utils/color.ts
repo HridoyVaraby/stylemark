@@ -1,4 +1,5 @@
 export function hexToHsl(hex: string): string {
+  if (!hex) return '0 0% 0%'
   // Remove the hash if it exists
   hex = hex.replace(/^#/, '')
 
@@ -35,4 +36,37 @@ export function hexToHsl(hex: string): string {
   l = +(l * 100).toFixed(1)
 
   return `${h} ${s}% ${l}%`
+}
+
+export function getLuminance(hex: string): number {
+  if (!hex) return 0
+  hex = hex.replace(/^#/, '')
+  if (hex.length === 3) {
+    hex = hex.split('').map(c => c + c).join('')
+  }
+
+  const rgb = [
+    parseInt(hex.substring(0, 2), 16) / 255,
+    parseInt(hex.substring(2, 4), 16) / 255,
+    parseInt(hex.substring(4, 6), 16) / 255
+  ].map(v => {
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
+  })
+
+  return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]
+}
+
+export function getContrastForeground(bgHex: string): string {
+  const luminance = getLuminance(bgHex)
+  // Threshold for switching from dark text to light text.
+  // Using ~0.179 as a standard split, adjust if needed.
+  return luminance > 0.179 ? '#020817' : '#f8fafc' // More aesthetically pleasing than pure black/white
+}
+
+export function getContrastRatio(hex1: string, hex2: string): number {
+  const lum1 = getLuminance(hex1)
+  const lum2 = getLuminance(hex2)
+  const brightest = Math.max(lum1, lum2)
+  const darkest = Math.min(lum1, lum2)
+  return (brightest + 0.05) / (darkest + 0.05)
 }
