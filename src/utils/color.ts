@@ -1,7 +1,11 @@
 export function hexToHsl(hex: string): string {
   if (!hex) return '0 0% 0%'
+  if (!/^#?([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/i.test(hex)) return '0 0% 0%'
   // Remove the hash if it exists
   hex = hex.replace(/^#/, '')
+  if (hex.length === 3) {
+    hex = hex.split('').map(c => c + c).join('')
+  }
 
   // Parse the r, g, b values
   const r = parseInt(hex.substring(0, 2), 16) / 255
