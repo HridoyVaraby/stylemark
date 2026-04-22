@@ -47,24 +47,24 @@ export function ControlCenter() {
     const presets = {
       luxury: {
         meta: { baseTheme: 'dark' as const, projectName: store.meta.projectName },
-        lightColors: { ...store.lightColors, primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', success: '#2e8b57', warning: '#d2691e', destructive: '#8b0000' },
-        darkColors: { ...store.darkColors, primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', success: '#2e8b57', warning: '#d2691e', destructive: '#8b0000' },
+        lightColors: { ...store.lightColors, primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', destructive: '#8b0000' },
+        darkColors: { ...store.darkColors, primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', destructive: '#8b0000' },
         typography: { headingFont: 'Playfair Display', bodyFont: 'Lato', baseSize: 1, letterSpacing: 0, lineHeight: 1.5 },
         geometry: { radius: '0rem', borderThickness: 1 },
         effects: { shadowDepth: 'flat' as const, transitionEasing: 'ease-in-out' as const }
       },
       saas: {
         meta: { baseTheme: 'light' as const, projectName: store.meta.projectName },
-        lightColors: { ...store.lightColors, primary: '#2563eb', secondary: '#f1f5f9', accent: '#3b82f6', background: '#ffffff', foreground: '#0f172a', success: '#10b981', warning: '#f59e0b', destructive: '#ef4444' },
-        darkColors: { ...store.darkColors, primary: '#3b82f6', secondary: '#1e293b', accent: '#2563eb', background: '#020817', foreground: '#f8fafc', success: '#10b981', warning: '#f59e0b', destructive: '#ef4444' },
+        lightColors: { ...store.lightColors, primary: '#2563eb', secondary: '#f1f5f9', accent: '#3b82f6', background: '#ffffff', foreground: '#0f172a', destructive: '#ef4444' },
+        darkColors: { ...store.darkColors, primary: '#3b82f6', secondary: '#1e293b', accent: '#2563eb', background: '#020817', foreground: '#f8fafc', destructive: '#ef4444' },
         typography: { headingFont: 'Inter', bodyFont: 'Inter', baseSize: 1, letterSpacing: 0, lineHeight: 1.5 },
         geometry: { radius: '0.375rem', borderThickness: 1 },
         effects: { shadowDepth: 'elevated' as const, transitionEasing: 'ease-out' as const }
       },
       playful: {
         meta: { baseTheme: 'light' as const, projectName: store.meta.projectName },
-        lightColors: { ...store.lightColors, primary: '#ec4899', secondary: '#fdf2f8', accent: '#8b5cf6', background: '#ffffff', foreground: '#111827', success: '#10b981', warning: '#f59e0b', destructive: '#ef4444' },
-        darkColors: { ...store.darkColors, primary: '#f472b6', secondary: '#4c1d95', accent: '#a78bfa', background: '#030712', foreground: '#f9fafb', success: '#10b981', warning: '#f59e0b', destructive: '#ef4444' },
+        lightColors: { ...store.lightColors, primary: '#ec4899', secondary: '#fdf2f8', accent: '#8b5cf6', background: '#ffffff', foreground: '#111827', destructive: '#ef4444' },
+        darkColors: { ...store.darkColors, primary: '#f472b6', secondary: '#4c1d95', accent: '#a78bfa', background: '#030712', foreground: '#f9fafb', destructive: '#ef4444' },
         typography: { headingFont: 'Poppins', bodyFont: 'Poppins', baseSize: 1.125, letterSpacing: 0, lineHeight: 1.5 },
         geometry: { radius: '9999px', borderThickness: 2 },
         effects: { shadowDepth: 'floating' as const, transitionEasing: 'spring' as const }

@@ -112,7 +112,7 @@ export function PreviewDashboard() {
           <div className="p-8 space-y-8" style={{ fontFamily: 'var(--font-body)' }}>
             <header className="flex justify-between items-center mb-12">
               <div>
-                <h1 style={{ fontFamily: 'var(--font-heading)' }} className="text-4xl font-bold tracking-tight">
+                <h1 style={{ fontFamily: 'var(--font-heading)', letterSpacing: `${store.typography.letterSpacing}em`, lineHeight: store.typography.lineHeight }} className="text-4xl font-bold">
                   {store.meta.projectName || 'Welcome to StyleMark'}
                 </h1>
                 <p className="text-muted-foreground text-lg mt-2">
@@ -289,28 +289,28 @@ export function PreviewDashboard() {
               <TabsContent value="typography" className="space-y-8 max-w-3xl">
                 <div className="space-y-4">
                   <div className="grid gap-1 border-b pb-4">
-                    <h1 style={{ fontFamily: 'var(--font-heading)' }} className="text-4xl font-extrabold tracking-tight lg:text-5xl">
+                    <h1 style={{ fontFamily: 'var(--font-heading)', letterSpacing: `${store.typography.letterSpacing}em`, lineHeight: store.typography.lineHeight }} className="text-4xl font-extrabold lg:text-5xl">
                       Heading 1: The quick brown fox
                     </h1>
                     <p className="text-sm text-muted-foreground font-mono">4rem / var(--font-heading) / 800</p>
                   </div>
 
                   <div className="grid gap-1 border-b pb-4">
-                    <h2 style={{ fontFamily: 'var(--font-heading)' }} className="text-3xl font-semibold tracking-tight transition-colors first:mt-0">
+                    <h2 style={{ fontFamily: 'var(--font-heading)', letterSpacing: `${store.typography.letterSpacing}em`, lineHeight: store.typography.lineHeight }} className="text-3xl font-semibold transition-colors first:mt-0">
                       Heading 2: Jumps over the lazy dog
                     </h2>
                     <p className="text-sm text-muted-foreground font-mono">3rem / var(--font-heading) / 600</p>
                   </div>
 
                   <div className="grid gap-1 border-b pb-4">
-                    <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-2xl font-semibold tracking-tight">
+                    <h3 style={{ fontFamily: 'var(--font-heading)', letterSpacing: `${store.typography.letterSpacing}em`, lineHeight: store.typography.lineHeight }} className="text-2xl font-semibold">
                       Heading 3: Pack my box with five dozen liquor jugs
                     </h3>
                     <p className="text-sm text-muted-foreground font-mono">2rem / var(--font-heading) / 600</p>
                   </div>
 
                   <div className="grid gap-1 border-b pb-4">
-                    <h4 style={{ fontFamily: 'var(--font-heading)' }} className="text-xl font-semibold tracking-tight">
+                    <h4 style={{ fontFamily: 'var(--font-heading)', letterSpacing: `${store.typography.letterSpacing}em`, lineHeight: store.typography.lineHeight }} className="text-xl font-semibold">
                       Heading 4: How vexingly quick daft zebras jump
                     </h4>
                     <p className="text-sm text-muted-foreground font-mono">1.5rem / var(--font-heading) / 600</p>
@@ -320,10 +320,10 @@ export function PreviewDashboard() {
                 <div className="space-y-4">
                   <div className="grid gap-2">
                     <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-xl font-semibold">Body Text</h3>
-                    <p className="leading-7 [&:not(:first-child)]:mt-6">
+                    <p style={{ lineHeight: store.typography.lineHeight }} className="[&:not(:first-child)]:mt-6">
                       The king, seeing how much mother and daughter suffered, resolved to free them from this persecution. He ordered his soldiers to capture the dwarf, but the little man was so quick and cunning that he always managed to escape.
                     </p>
-                    <p className="leading-7 [&:not(:first-child)]:mt-6">
+                    <p style={{ lineHeight: store.typography.lineHeight }} className="[&:not(:first-child)]:mt-6">
                       One day, the princess was walking in the garden when the dwarf appeared before her. "I have a proposition for you," he said. "If you can guess my name, I will leave you and your mother in peace. But if you fail, you must marry me."
                     </p>
                   </div>
