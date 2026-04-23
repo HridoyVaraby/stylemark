@@ -1,4 +1,5 @@
 import type { ThemeState } from '@/store/useThemeStore'
+import { sanitizeInput } from './sanitize'
 
 export function generateTailwindConfig(state: ThemeState): string {
   const { geometry } = state
@@ -50,7 +51,7 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       borderWidth: {
-        DEFAULT: "${geometry.borderThickness}px",
+        DEFAULT: "${sanitizeInput(geometry.borderThickness)}px",
       }
     },
   },

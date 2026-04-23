@@ -1,5 +1,6 @@
 import type { ThemeState } from '@/store/useThemeStore'
 import { hexToHsl } from './color'
+import { sanitizeInput } from './sanitize'
 
 export function generateMarkdown(state: ThemeState): string {
   const { meta, lightColors, darkColors, typography, geometry, effects } = state
@@ -23,7 +24,7 @@ export function generateMarkdown(state: ThemeState): string {
   --border: ${hexToHsl(lightColors.border)};
   --input: ${hexToHsl(lightColors.input)};
   --ring: ${hexToHsl(lightColors.ring)};
-  --radius: ${geometry.radius};`
+  --radius: ${sanitizeInput(geometry.radius)};`
 
   const darkVars = `  --background: ${hexToHsl(darkColors.background)};
   --foreground: ${hexToHsl(darkColors.foreground)};
@@ -45,7 +46,7 @@ export function generateMarkdown(state: ThemeState): string {
   --input: ${hexToHsl(darkColors.input)};
   --ring: ${hexToHsl(darkColors.ring)};`
 
-  const fontsUrl = `https://fonts.googleapis.com/css2?family=${typography.headingFont.replace(/ /g, '+')}:wght@400;700&family=${typography.bodyFont.replace(/ /g, '+')}:wght@400;500&display=swap`
+  const fontsUrl = `https://fonts.googleapis.com/css2?family=${sanitizeInput(typography.headingFont).replace(/ /g, '+')}:wght@400;700&family=${sanitizeInput(typography.bodyFont).replace(/ /g, '+')}:wght@400;500&display=swap`
 
   let shadowRule = ''
   if (effects.shadowDepth === 'flat') {
@@ -56,10 +57,10 @@ export function generateMarkdown(state: ThemeState): string {
     shadowRule = 'Apply shadow-xl to all interactive floating elements.'
   }
 
-  return `# Product Requirements & Design System: ${meta.projectName}
+  return `# Product Requirements & Design System: ${sanitizeInput(meta.projectName)}
 
 ## 1. Project Meta & Agent Directives
-**Project Name:** ${meta.projectName}
+**Project Name:** ${sanitizeInput(meta.projectName)}
 **Base Theme:** ${meta.baseTheme}
 
 **Strict Instruction Set:**
@@ -104,7 +105,7 @@ Ensure your \`tailwind.config.js\` maps these variables properly. Example:
         "DEFAULT": "var(--radius)"
       },
       "borderWidth": {
-        "DEFAULT": "${geometry.borderThickness}px"
+        "DEFAULT": "${sanitizeInput(geometry.borderThickness)}px"
       }
     }
   }
@@ -112,11 +113,11 @@ Ensure your \`tailwind.config.js\` maps these variables properly. Example:
 \`\`\`
 
 ## 4. Typography Specifications
-**Heading Font:** ${typography.headingFont}
-**Body Font:** ${typography.bodyFont}
-**Base Size:** ${typography.baseSize}rem
-**Letter Spacing:** ${typography.letterSpacing}em
-**Line Height:** ${typography.lineHeight}
+**Heading Font:** ${sanitizeInput(typography.headingFont)}
+**Body Font:** ${sanitizeInput(typography.bodyFont)}
+**Base Size:** ${sanitizeInput(typography.baseSize)}rem
+**Letter Spacing:** ${sanitizeInput(typography.letterSpacing)}em
+**Line Height:** ${sanitizeInput(typography.lineHeight)}
 
 **Include the following Google Fonts link in your \`index.html\`:**
 \`\`\`html
@@ -124,14 +125,14 @@ Ensure your \`tailwind.config.js\` maps these variables properly. Example:
 \`\`\`
 
 **Hierarchical Instructions:**
-- Apply tracking of \`${typography.letterSpacing}em\` and leading of \`${typography.lineHeight}\` globally.
-- Body text should use \`${typography.bodyFont}\` at \`${typography.baseSize}rem\`.
-- Headings (h1-h6) should use \`${typography.headingFont}\` with appropriate scaling.
+- Apply tracking of \`${sanitizeInput(typography.letterSpacing)}em\` and leading of \`${sanitizeInput(typography.lineHeight)}\` globally.
+- Body text should use \`${sanitizeInput(typography.bodyFont)}\` at \`${sanitizeInput(typography.baseSize)}rem\`.
+- Headings (h1-h6) should use \`${sanitizeInput(typography.headingFont)}\` with appropriate scaling.
 
 ## 5. Component Guidelines
 **Geometry:**
-- Use \`${geometry.radius}\` border-radius for all primary UI elements (buttons, cards, inputs).
-- Border thickness is set globally to \`${geometry.borderThickness}px\`.
+- Use \`${sanitizeInput(geometry.radius)}\` border-radius for all primary UI elements (buttons, cards, inputs).
+- Border thickness is set globally to \`${sanitizeInput(geometry.borderThickness)}px\`.
 
 **Effects & Animation:**
 - **Shadows:** ${shadowRule}
