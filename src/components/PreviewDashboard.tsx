@@ -11,6 +11,7 @@ import { Badge } from './ui/badge'
 import { Alert, AlertDescription, AlertTitle } from './ui/alert'
 import { Switch } from './ui/switch'
 import { Label } from './ui/label'
+const mockUsers = [1, 2, 3, 4];
 
 export function PreviewDashboard() {
   const store = useThemeStore()
@@ -178,7 +179,7 @@ export function PreviewDashboard() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {[1, 2, 3, 4].map(i => (
+                        {mockUsers.map(i => (
                           <TableRow key={i}>
                             <TableCell className="font-medium">User {i}</TableCell>
                             <TableCell>Completed</TableCell>
