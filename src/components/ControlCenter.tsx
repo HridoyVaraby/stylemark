@@ -8,8 +8,36 @@ import { generateMarkdown } from '@/utils/generateMarkdown'
 import { generateCss } from '@/utils/generateCss'
 import { generateTailwindConfig } from '@/utils/generateTailwindConfig'
 import { Download, Upload } from 'lucide-react'
+import { getVibePreset, type VibeType } from '@/utils/vibePresets'
 
 const GOOGLE_FONTS = ['Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Poppins', 'Playfair Display']
+
+const VIBE_PRESETS = {
+  luxury: {
+    meta: { baseTheme: 'dark' as const },
+    lightColors: { primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', destructive: '#8b0000' },
+    darkColors: { primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', destructive: '#8b0000' },
+    typography: { headingFont: 'Playfair Display', bodyFont: 'Lato', baseSize: 1, letterSpacing: 0, lineHeight: 1.5 },
+    geometry: { radius: '0rem', borderThickness: 1 },
+    effects: { shadowDepth: 'flat' as const, transitionEasing: 'ease-in-out' as const }
+  },
+  saas: {
+    meta: { baseTheme: 'light' as const },
+    lightColors: { primary: '#2563eb', secondary: '#f1f5f9', accent: '#3b82f6', background: '#ffffff', foreground: '#0f172a', destructive: '#ef4444' },
+    darkColors: { primary: '#3b82f6', secondary: '#1e293b', accent: '#2563eb', background: '#020817', foreground: '#f8fafc', destructive: '#ef4444' },
+    typography: { headingFont: 'Inter', bodyFont: 'Inter', baseSize: 1, letterSpacing: 0, lineHeight: 1.5 },
+    geometry: { radius: '0.375rem', borderThickness: 1 },
+    effects: { shadowDepth: 'elevated' as const, transitionEasing: 'ease-out' as const }
+  },
+  playful: {
+    meta: { baseTheme: 'light' as const },
+    lightColors: { primary: '#ec4899', secondary: '#fdf2f8', accent: '#8b5cf6', background: '#ffffff', foreground: '#111827', destructive: '#ef4444' },
+    darkColors: { primary: '#f472b6', secondary: '#4c1d95', accent: '#a78bfa', background: '#030712', foreground: '#f9fafb', destructive: '#ef4444' },
+    typography: { headingFont: 'Poppins', bodyFont: 'Poppins', baseSize: 1.125, letterSpacing: 0, lineHeight: 1.5 },
+    geometry: { radius: '9999px', borderThickness: 2 },
+    effects: { shadowDepth: 'floating' as const, transitionEasing: 'spring' as const }
+  }
+}
 
 export function ControlCenter() {
   const store = useThemeStore()
@@ -26,15 +54,17 @@ export function ControlCenter() {
 
   const handleExportJson = () => {
     const state = useThemeStore.getState()
-    const data = { ...state } as Record<string, unknown>
-    delete data.setMeta
-    delete data.setLightColors
-    delete data.setDarkColors
-    delete data.setTypography
-    delete data.setGeometry
-    delete data.setEffects
-    delete data.applyPreset
-    delete data.loadState
+    const {
+      setMeta: _setMeta,
+      setLightColors: _setLightColors,
+      setDarkColors: _setDarkColors,
+      setTypography: _setTypography,
+      setGeometry: _setGeometry,
+      setEffects: _setEffects,
+      applyPreset: _applyPreset,
+      loadState: _loadState,
+      ...data
+    } = state
     downloadBlob(JSON.stringify(data, null, 2), `${store.meta.projectName || 'stylemark'}-session.json`, 'application/json')
   }
 
@@ -43,34 +73,8 @@ export function ControlCenter() {
   const handleExportCss = () => downloadBlob(generateCss(useThemeStore.getState()), 'globals.css', 'text/css')
 
   const handleExportTailwindConfig = () => downloadBlob(generateTailwindConfig(useThemeStore.getState()), 'tailwind.config.js', 'application/javascript')
-  const applyVibe = (vibe: 'luxury' | 'saas' | 'playful') => {
-    const presets = {
-      luxury: {
-        meta: { baseTheme: 'dark' as const, projectName: store.meta.projectName },
-        lightColors: { ...store.lightColors, primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', destructive: '#8b0000' },
-        darkColors: { ...store.darkColors, primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', destructive: '#8b0000' },
-        typography: { headingFont: 'Playfair Display', bodyFont: 'Lato', baseSize: 1, letterSpacing: 0, lineHeight: 1.5 },
-        geometry: { radius: '0rem', borderThickness: 1 },
-        effects: { shadowDepth: 'flat' as const, transitionEasing: 'ease-in-out' as const }
-      },
-      saas: {
-        meta: { baseTheme: 'light' as const, projectName: store.meta.projectName },
-        lightColors: { ...store.lightColors, primary: '#2563eb', secondary: '#f1f5f9', accent: '#3b82f6', background: '#ffffff', foreground: '#0f172a', destructive: '#ef4444' },
-        darkColors: { ...store.darkColors, primary: '#3b82f6', secondary: '#1e293b', accent: '#2563eb', background: '#020817', foreground: '#f8fafc', destructive: '#ef4444' },
-        typography: { headingFont: 'Inter', bodyFont: 'Inter', baseSize: 1, letterSpacing: 0, lineHeight: 1.5 },
-        geometry: { radius: '0.375rem', borderThickness: 1 },
-        effects: { shadowDepth: 'elevated' as const, transitionEasing: 'ease-out' as const }
-      },
-      playful: {
-        meta: { baseTheme: 'light' as const, projectName: store.meta.projectName },
-        lightColors: { ...store.lightColors, primary: '#ec4899', secondary: '#fdf2f8', accent: '#8b5cf6', background: '#ffffff', foreground: '#111827', destructive: '#ef4444' },
-        darkColors: { ...store.darkColors, primary: '#f472b6', secondary: '#4c1d95', accent: '#a78bfa', background: '#030712', foreground: '#f9fafb', destructive: '#ef4444' },
-        typography: { headingFont: 'Poppins', bodyFont: 'Poppins', baseSize: 1.125, letterSpacing: 0, lineHeight: 1.5 },
-        geometry: { radius: '9999px', borderThickness: 2 },
-        effects: { shadowDepth: 'floating' as const, transitionEasing: 'spring' as const }
-      }
-    }
-    store.applyPreset(presets[vibe])
+  const applyVibe = (vibe: VibeType) => {
+    store.applyPreset(getVibePreset(vibe, store.meta.projectName, store.lightColors, store.darkColors))
   }
 
   return (
