@@ -27,15 +27,17 @@ export function ControlCenter() {
 
   const handleExportJson = () => {
     const state = useThemeStore.getState()
-    const data = { ...state } as Record<string, unknown>
-    delete data.setMeta
-    delete data.setLightColors
-    delete data.setDarkColors
-    delete data.setTypography
-    delete data.setGeometry
-    delete data.setEffects
-    delete data.applyPreset
-    delete data.loadState
+    const {
+      setMeta: _setMeta,
+      setLightColors: _setLightColors,
+      setDarkColors: _setDarkColors,
+      setTypography: _setTypography,
+      setGeometry: _setGeometry,
+      setEffects: _setEffects,
+      applyPreset: _applyPreset,
+      loadState: _loadState,
+      ...data
+    } = state
     downloadBlob(JSON.stringify(data, null, 2), `${store.meta.projectName || 'stylemark'}-session.json`, 'application/json')
   }
 
