@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useThemeStore } from '@/store/useThemeStore'
 import { hexToHsl } from '@/utils/color'
 import { Button } from './ui/button'
@@ -11,21 +11,22 @@ import { Badge } from './ui/badge'
 import { Alert, AlertDescription, AlertTitle } from './ui/alert'
 import { Switch } from './ui/switch'
 import { Label } from './ui/label'
+const mockUsers = [1, 2, 3, 4];
 
 export function PreviewDashboard() {
   const store = useThemeStore()
   const [viewport, setViewport] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
-  const [isDark, setIsDark] = useState(false)
+  const [isDark, setIsDark] = useState(store.meta.baseTheme === 'dark')
+  const [prevBaseTheme, setPrevBaseTheme] = useState(store.meta.baseTheme)
 
-  // Sync isDark with baseTheme initially
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  if (store.meta.baseTheme !== prevBaseTheme) {
+    setPrevBaseTheme(store.meta.baseTheme)
     setIsDark(store.meta.baseTheme === 'dark')
-  }, [store.meta.baseTheme])
+  }
 
   // Inject CSS Variables
   const activeColors = isDark ? store.darkColors : store.lightColors;
-  const styleVariables = {
+  const styleVariables = useMemo(() => ({
     '--background': hexToHsl(activeColors.background),
     '--foreground': hexToHsl(activeColors.foreground),
     '--card': hexToHsl(activeColors.card),
@@ -56,7 +57,7 @@ export function PreviewDashboard() {
     '--font-body': `"${store.typography.bodyFont}", sans-serif`,
     fontSize: `${store.typography.baseSize * 16}px`,
     fontFamily: 'var(--font-body)',
-  } as React.CSSProperties
+  } as React.CSSProperties), [activeColors, store.typography, store.geometry])
 
   // Inject Fonts
   useEffect(() => {
@@ -178,7 +179,7 @@ export function PreviewDashboard() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {[1, 2, 3, 4].map(i => (
+                        {mockUsers.map(i => (
                           <TableRow key={i}>
                             <TableCell className="font-medium">User {i}</TableCell>
                             <TableCell>Completed</TableCell>

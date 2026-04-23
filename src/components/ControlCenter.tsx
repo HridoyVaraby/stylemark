@@ -8,6 +8,7 @@ import { generateMarkdown } from '@/utils/generateMarkdown'
 import { generateCss } from '@/utils/generateCss'
 import { generateTailwindConfig } from '@/utils/generateTailwindConfig'
 import { Download, Upload } from 'lucide-react'
+import { getVibePreset, type VibeType } from '@/utils/vibePresets'
 
 const GOOGLE_FONTS = ['Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Poppins', 'Playfair Display']
 
@@ -53,15 +54,17 @@ export function ControlCenter() {
 
   const handleExportJson = () => {
     const state = useThemeStore.getState()
-    const data = { ...state } as Record<string, unknown>
-    delete data.setMeta
-    delete data.setLightColors
-    delete data.setDarkColors
-    delete data.setTypography
-    delete data.setGeometry
-    delete data.setEffects
-    delete data.applyPreset
-    delete data.loadState
+    const {
+      setMeta: _setMeta,
+      setLightColors: _setLightColors,
+      setDarkColors: _setDarkColors,
+      setTypography: _setTypography,
+      setGeometry: _setGeometry,
+      setEffects: _setEffects,
+      applyPreset: _applyPreset,
+      loadState: _loadState,
+      ...data
+    } = state
     downloadBlob(JSON.stringify(data, null, 2), `${store.meta.projectName || 'stylemark'}-session.json`, 'application/json')
   }
 
@@ -70,14 +73,8 @@ export function ControlCenter() {
   const handleExportCss = () => downloadBlob(generateCss(useThemeStore.getState()), 'globals.css', 'text/css')
 
   const handleExportTailwindConfig = () => downloadBlob(generateTailwindConfig(useThemeStore.getState()), 'tailwind.config.js', 'application/javascript')
-  const applyVibe = (vibe: keyof typeof VIBE_PRESETS) => {
-    const preset = VIBE_PRESETS[vibe]
-    store.applyPreset({
-      ...preset,
-      meta: { ...preset.meta, projectName: store.meta.projectName },
-      lightColors: { ...store.lightColors, ...preset.lightColors },
-      darkColors: { ...store.darkColors, ...preset.darkColors },
-    })
+  const applyVibe = (vibe: VibeType) => {
+    store.applyPreset(getVibePreset(vibe, store.meta.projectName, store.lightColors, store.darkColors))
   }
 
   return (
