@@ -1,3 +1,4 @@
+import { temporal } from 'zundo'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { getContrastForeground } from '@/utils/color'
@@ -143,7 +144,8 @@ const defaultState: Omit<ThemeState, 'setMeta' | 'setLightColors' | 'setDarkColo
 }
 
 export const useThemeStore = create<ThemeState>()(
-  persist(
+  temporal(
+    persist(
     (set) => ({
       ...defaultState,
       setMeta: (meta) => set((state) => ({ meta: { ...state.meta, ...meta } })),
@@ -193,5 +195,16 @@ export const useThemeStore = create<ThemeState>()(
     {
       name: 'stylemark-storage',
     }
-  )
+  ),
+  {
+    partialize: (state) => ({
+      meta: state.meta,
+      lightColors: state.lightColors,
+      darkColors: state.darkColors,
+      typography: state.typography,
+      geometry: state.geometry,
+      effects: state.effects,
+    }),
+  }
+)
 )
