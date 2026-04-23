@@ -1,6 +1,5 @@
 import type { ThemeState } from '@/store/useThemeStore'
 import { hexToHsl } from './color'
-import { sanitizeInput } from './sanitize'
 
 export function generateCss(state: ThemeState): string {
   const { lightColors, darkColors, geometry } = state
@@ -24,7 +23,7 @@ export function generateCss(state: ThemeState): string {
   --border: ${hexToHsl(lightColors.border)};
   --input: ${hexToHsl(lightColors.input)};
   --ring: ${hexToHsl(lightColors.ring)};
-  --radius: ${sanitizeInput(geometry.radius)};`
+  --radius: ${geometry.radius};`
 
   const darkVars = `  --background: ${hexToHsl(darkColors.background)};
   --foreground: ${hexToHsl(darkColors.foreground)};

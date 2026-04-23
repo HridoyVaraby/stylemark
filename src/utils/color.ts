@@ -1,9 +1,7 @@
-import { sanitizeHex } from './sanitize'
-
 export function hexToHsl(hex: string): string {
   if (!hex) return '0 0% 0%'
-  // Sanitize and remove the hash if it exists
-  hex = sanitizeHex(hex).replace(/^#/, '')
+  // Remove the hash if it exists
+  hex = hex.replace(/^#/, '')
 
   // Parse the r, g, b values
   const r = parseInt(hex.substring(0, 2), 16) / 255
@@ -42,7 +40,7 @@ export function hexToHsl(hex: string): string {
 
 export function getLuminance(hex: string): number {
   if (!hex) return 0
-  hex = sanitizeHex(hex).replace(/^#/, '')
+  hex = hex.replace(/^#/, '')
   if (hex.length === 3) {
     hex = hex.split('').map(c => c + c).join('')
   }
