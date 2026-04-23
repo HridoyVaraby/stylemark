@@ -15,13 +15,13 @@ import { Label } from './ui/label'
 export function PreviewDashboard() {
   const store = useThemeStore()
   const [viewport, setViewport] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
-  const [isDark, setIsDark] = useState(false)
+  const [isDark, setIsDark] = useState(store.meta.baseTheme === 'dark')
+  const [prevBaseTheme, setPrevBaseTheme] = useState(store.meta.baseTheme)
 
-  // Sync isDark with baseTheme initially
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  if (store.meta.baseTheme !== prevBaseTheme) {
+    setPrevBaseTheme(store.meta.baseTheme)
     setIsDark(store.meta.baseTheme === 'dark')
-  }, [store.meta.baseTheme])
+  }
 
   // Inject CSS Variables
   const activeColors = isDark ? store.darkColors : store.lightColors;
