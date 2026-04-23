@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useThemeStore } from '@/store/useThemeStore'
 import { hexToHsl } from '@/utils/color'
 import { Button } from './ui/button'
@@ -25,7 +25,7 @@ export function PreviewDashboard() {
 
   // Inject CSS Variables
   const activeColors = isDark ? store.darkColors : store.lightColors;
-  const styleVariables = {
+  const styleVariables = useMemo(() => ({
     '--background': hexToHsl(activeColors.background),
     '--foreground': hexToHsl(activeColors.foreground),
     '--card': hexToHsl(activeColors.card),
@@ -56,7 +56,7 @@ export function PreviewDashboard() {
     '--font-body': `"${store.typography.bodyFont}", sans-serif`,
     fontSize: `${store.typography.baseSize * 16}px`,
     fontFamily: 'var(--font-body)',
-  } as React.CSSProperties
+  } as React.CSSProperties), [activeColors, store.typography, store.geometry])
 
   // Inject Fonts
   useEffect(() => {
