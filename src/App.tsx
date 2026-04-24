@@ -29,7 +29,7 @@ function App() {
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background text-foreground">
       {/* Left Pane: Control Center */}
-      <div className="w-[400px] flex-shrink-0 border-r bg-muted/20 overflow-y-auto">
+      <div className="w-[400px] flex-shrink-0 border-r bg-muted/20 h-full overflow-hidden flex flex-col">
         <ControlCenter />
       </div>
 

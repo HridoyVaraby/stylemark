@@ -6,7 +6,7 @@ import { Input } from './ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table'
-import { Laptop, Smartphone, Tablet, Moon, Sun } from 'lucide-react'
+import { Laptop, Smartphone, Tablet, Moon, Sun, LayoutDashboard, Settings, Users, Activity, CreditCard, Bell, Search } from 'lucide-react'
 import { Badge } from './ui/badge'
 import { Alert, AlertDescription, AlertTitle } from './ui/alert'
 import { Switch } from './ui/switch'
@@ -103,37 +103,76 @@ export function PreviewDashboard() {
       </div>
 
       {/* Preview Area */}
-      <div className="flex-1 overflow-auto flex items-center justify-center p-4">
+      <div className="flex-1 overflow-auto flex items-start justify-center p-4 sm:p-8">
         <div
-          className={`${viewportWidths[viewport]} h-full min-h-[600px] border shadow-2xl transition-all duration-300 mx-auto overflow-y-auto bg-background text-foreground ${isDark ? 'dark' : ''}`}
+          className={`${viewportWidths[viewport]} h-[800px] rounded-xl border border-slate-700 shadow-2xl transition-all duration-300 mx-auto overflow-hidden bg-background text-foreground flex ${isDark ? 'dark' : ''}`}
           style={styleVariables}
         >
-          {/* Inside the injected scope */}
-          <div className="p-8 space-y-8" style={{ fontFamily: 'var(--font-body)' }}>
-            <header className="flex justify-between items-center mb-12">
-              <div>
-                <h1 style={{ fontFamily: 'var(--font-heading)', letterSpacing: `${store.typography.letterSpacing}em`, lineHeight: store.typography.lineHeight }} className="text-4xl font-bold">
-                  {store.meta.projectName || 'Welcome to StyleMark'}
-                </h1>
-                <p className="text-muted-foreground text-lg mt-2">
-                  This is a live preview of your generated design system.
-                </p>
+          {/* Mock Sidebar */}
+          <div className="w-64 border-r bg-card flex-shrink-0 hidden md:flex flex-col">
+            <div className="h-16 flex items-center px-6 border-b">
+              <div className="font-bold text-lg" style={{ fontFamily: 'var(--font-heading)' }}>
+                {store.meta.projectName || 'StyleMark'}
               </div>
-              <div className="flex gap-2">
-                <Button>Primary Action</Button>
-                <Button variant="outline">Secondary</Button>
-              </div>
-            </header>
+            </div>
+            <div className="p-4 space-y-2 flex-1">
+              <Button variant="secondary" className="w-full justify-start">
+                <LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard
+              </Button>
+              <Button variant="ghost" className="w-full justify-start text-muted-foreground">
+                <Users className="w-4 h-4 mr-2" /> Team
+              </Button>
+              <Button variant="ghost" className="w-full justify-start text-muted-foreground">
+                <Activity className="w-4 h-4 mr-2" /> Analytics
+              </Button>
+              <Button variant="ghost" className="w-full justify-start text-muted-foreground">
+                <CreditCard className="w-4 h-4 mr-2" /> Billing
+              </Button>
+            </div>
+            <div className="p-4 border-t">
+              <Button variant="ghost" className="w-full justify-start text-muted-foreground">
+                <Settings className="w-4 h-4 mr-2" /> Settings
+              </Button>
+            </div>
+          </div>
 
-            <Tabs defaultValue="dashboard">
-              <TabsList className="mb-4">
-                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-                <TabsTrigger value="components">Components</TabsTrigger>
-                <TabsTrigger value="typography">Typography</TabsTrigger>
-              </TabsList>
+          {/* Main Content Area */}
+          <div className="flex-1 flex flex-col h-full overflow-hidden">
+            {/* Mock Header */}
+            <div className="h-16 border-b bg-background flex items-center justify-between px-6 flex-shrink-0">
+              <div className="flex items-center gap-4 flex-1">
+                <div className="relative w-64 hidden sm:block">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input placeholder="Search..." className="pl-9 bg-muted/50 border-none" />
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground">
+                  <Bell className="w-5 h-5" />
+                </Button>
+                <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-medium text-sm">
+                  SM
+                </div>
+              </div>
+            </div>
+
+            {/* Inside the injected scope */}
+            <div className="p-6 md:p-8 space-y-8 overflow-y-auto flex-1" style={{ fontFamily: 'var(--font-body)' }}>
+              <Tabs defaultValue="dashboard" className="w-full">
+                <div className="flex items-center justify-between mb-8">
+                  <TabsList>
+                    <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                    <TabsTrigger value="components">Components</TabsTrigger>
+                    <TabsTrigger value="typography">Typography</TabsTrigger>
+                  </TabsList>
+                  <div className="hidden sm:flex gap-2">
+                    <Button variant="outline">Export Data</Button>
+                    <Button>Create New</Button>
+                  </div>
+                </div>
               
-              <TabsContent value="dashboard" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <TabsContent value="dashboard" className="space-y-6 focus-visible:outline-none focus-visible:ring-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   <Card>
                     <CardHeader>
                       <CardTitle style={{ fontFamily: 'var(--font-heading)' }}>Revenue</CardTitle>
@@ -191,44 +230,67 @@ export function PreviewDashboard() {
                   </CardContent>
                 </Card>
 
-                <div className="space-y-4">
-                  <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-xl font-semibold">Badges</h3>
-                  <div className="flex flex-wrap gap-4">
-                    <Badge>Default</Badge>
-                    <Badge variant="secondary">Secondary</Badge>
-                    <Badge variant="outline">Outline</Badge>
-                    <Badge variant="destructive">Destructive</Badge>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle style={{ fontFamily: 'var(--font-heading)' }}>Account Settings</CardTitle>
+                      <CardDescription>Update your account preferences here.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Display Name</Label>
+                        <Input id="name" defaultValue="Jane Doe" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email Address</Label>
+                        <Input id="email" type="email" defaultValue="jane@example.com" />
+                      </div>
+                      <div className="flex items-center space-x-2 pt-2">
+                        <Switch id="notifications" defaultChecked />
+                        <Label htmlFor="notifications">Receive marketing emails</Label>
+                      </div>
+                    </CardContent>
+                    <div className="px-6 py-4 border-t bg-muted/50 flex justify-end gap-2 rounded-b-xl">
+                      <Button variant="ghost">Cancel</Button>
+                      <Button>Save Changes</Button>
+                    </div>
+                  </Card>
+
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-lg font-semibold">Status Overview</h3>
+                      <div className="grid gap-4">
+                        <Alert>
+                          <Bell className="h-4 w-4" />
+                          <AlertTitle>System Update</AlertTitle>
+                          <AlertDescription>
+                            A new software version is available for download.
+                          </AlertDescription>
+                        </Alert>
+                        <Alert variant="destructive">
+                          <AlertTitle>Payment Failed</AlertTitle>
+                          <AlertDescription>
+                            Please update your billing information to continue your subscription.
+                          </AlertDescription>
+                        </Alert>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-lg font-semibold">Project Tags</h3>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge>Production</Badge>
+                        <Badge variant="secondary">Staging</Badge>
+                        <Badge variant="outline">Backend</Badge>
+                        <Badge variant="destructive">Deprecated</Badge>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-xl font-semibold">Alerts</h3>
-                  <div className="grid gap-4 max-w-md">
-                    <Alert>
-                      <AlertTitle>Default Alert</AlertTitle>
-                      <AlertDescription>
-                        This is a standard alert message without special styling.
-                      </AlertDescription>
-                    </Alert>
-                    <Alert variant="destructive">
-                      <AlertTitle>Destructive Alert</AlertTitle>
-                      <AlertDescription>
-                        This indicates a critical error or destructive action warning.
-                      </AlertDescription>
-                    </Alert>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-xl font-semibold">Toggles</h3>
-                  <div className="flex items-center space-x-2">
-                    <Switch id="airplane-mode-components" />
-                    <Label htmlFor="airplane-mode-components">Airplane Mode</Label>
-                  </div>
-                </div>
               </TabsContent>
 
-              <TabsContent value="components" className="space-y-8 max-w-2xl">
+              <TabsContent value="components" className="space-y-12 max-w-3xl focus-visible:outline-none focus-visible:ring-0">
                 <div className="space-y-4">
                   <h3 style={{ fontFamily: 'var(--font-heading)' }} className="text-xl font-semibold">Buttons</h3>
                   <div className="flex flex-wrap gap-4">
@@ -286,7 +348,7 @@ export function PreviewDashboard() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="typography" className="space-y-8 max-w-3xl">
+              <TabsContent value="typography" className="space-y-8 max-w-3xl focus-visible:outline-none focus-visible:ring-0">
                 <div className="space-y-4">
                   <div className="grid gap-1 border-b pb-4">
                     <h1 style={{ fontFamily: 'var(--font-heading)', letterSpacing: `${store.typography.letterSpacing}em`, lineHeight: store.typography.lineHeight }} className="text-4xl font-extrabold lg:text-5xl">
@@ -337,6 +399,7 @@ export function PreviewDashboard() {
                 </div>
               </TabsContent>
             </Tabs>
+            </div>
           </div>
         </div>
       </div>
