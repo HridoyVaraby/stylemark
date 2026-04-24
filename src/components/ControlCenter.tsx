@@ -18,7 +18,7 @@ import { Download, Upload, Share2, Copy, Check, Undo, Redo } from 'lucide-react'
 
 const GOOGLE_FONTS = ['Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Poppins', 'Playfair Display']
 
-export const VIBE_PRESETS = {
+const VIBE_PRESETS = {
   luxury: {
     meta: { baseTheme: 'dark' as const },
     lightColors: { primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', destructive: '#8b0000' },
@@ -45,6 +45,21 @@ export const VIBE_PRESETS = {
   }
 }
 
+const ColorRow = ({ label, colorKey }: { label: string, colorKey: keyof import('@/store/useThemeStore').ColorPalette }) => {
+  const store = useThemeStore();
+  const isDark = store.meta.baseTheme === 'dark' || (store.meta.baseTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const activeColors = isDark ? store.darkColors : store.lightColors;
+  const updateFn = isDark ? store.setDarkColors : store.setLightColors;
+
+  return (
+    <div className="flex items-center gap-4 bg-background p-2 rounded-md border">
+      <input type="color" className="w-6 h-6 p-0 border-0 rounded cursor-pointer shrink-0" value={activeColors[colorKey]} onChange={(e) => updateFn({ [colorKey]: e.target.value })} />
+      <Label className="w-20">{label}</Label>
+      <Input value={activeColors[colorKey]} onChange={(e) => updateFn({ [colorKey]: e.target.value })} className="h-8 flex-1 font-mono text-xs border-none bg-muted/50" />
+    </div>
+  );
+}
+
 export function ControlCenter() {
   const [currentVibe, setCurrentVibe] = useState<'luxury' | 'saas' | 'playful'>('luxury')
   const [searchTerm, setSearchTerm] = useState('')
@@ -62,19 +77,6 @@ export function ControlCenter() {
 
   const filteredColorGroups = COLOR_GROUPS.filter(g => g.label.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  const ColorRow = ({ label, colorKey }: { label: string, colorKey: keyof typeof store.lightColors }) => {
-    const isDark = store.meta.baseTheme === 'dark' || (store.meta.baseTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    const activeColors = isDark ? store.darkColors : store.lightColors;
-    const updateFn = isDark ? store.setDarkColors : store.setLightColors;
-
-    return (
-      <div className="flex items-center gap-4 bg-background p-2 rounded-md border">
-        <input type="color" className="w-6 h-6 p-0 border-0 rounded cursor-pointer shrink-0" value={activeColors[colorKey]} onChange={(e) => updateFn({ [colorKey]: e.target.value })} />
-        <Label className="w-20">{label}</Label>
-        <Input value={activeColors[colorKey]} onChange={(e) => updateFn({ [colorKey]: e.target.value })} className="h-8 flex-1 font-mono text-xs border-none bg-muted/50" />
-      </div>
-    );
-  }
 
 
   const pastStates = useStore(useThemeStore.temporal, (state) => state.pastStates)

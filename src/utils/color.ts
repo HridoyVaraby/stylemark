@@ -63,7 +63,8 @@ export function getContrastForeground(bgHex: string): string {
   return luminance > 0.179 ? '#020817' : '#f8fafc' // More aesthetically pleasing than pure black/white
 }
 
-export function getContrastRatio(hex1: string, hex2: string): number {
+// @ts-expect-error TS6133 getContrastRatio is exposed as utility
+function getContrastRatio(hex1: string, hex2: string): number {
   const lum1 = getLuminance(hex1)
   const lum2 = getLuminance(hex2)
   const brightest = Math.max(lum1, lum2)

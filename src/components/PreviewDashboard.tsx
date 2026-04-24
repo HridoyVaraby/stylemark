@@ -197,16 +197,16 @@ export function PreviewDashboard() {
               <div className="flex-1 flex flex-col min-w-0 overflow-y-auto bg-[var(--background)]">
                 <div className="border-b px-6 py-4 flex items-center justify-between bg-background">
                   <div className="flex space-x-6 text-sm font-medium">
-                    <a href="#" className="text-muted-foreground hover:text-foreground">Custom</a>
-                    <a href="#" className="text-muted-foreground hover:text-foreground">Cards</a>
-                    <a href="#" className="text-[var(--accent)] bg-accent/30 rounded-full px-3 py-1 font-semibold">Dashboard</a>
-                    <a href="#" className="text-muted-foreground hover:text-foreground">Mail</a>
-                    <a href="#" className="text-muted-foreground hover:text-foreground">Pricing</a>
-                    <a href="#" className="text-muted-foreground hover:text-foreground">Color Palette</a>
-                    <a href="#" className="text-muted-foreground hover:text-foreground"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg></a>
+                    <button type="button" className="text-muted-foreground hover:text-foreground">Custom</button>
+                    <button type="button" className="text-muted-foreground hover:text-foreground">Cards</button>
+                    <button type="button" className="text-[var(--accent)] bg-accent/30 rounded-full px-3 py-1 font-semibold">Dashboard</button>
+                    <button type="button" className="text-muted-foreground hover:text-foreground">Mail</button>
+                    <button type="button" className="text-muted-foreground hover:text-foreground">Pricing</button>
+                    <button type="button" className="text-muted-foreground hover:text-foreground">Color Palette</button>
+                    <button type="button" className="text-muted-foreground hover:text-foreground"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg></button>
                   </div>
                   <div className="flex items-center space-x-4 text-sm">
-                    <a href="#" className="flex items-center gap-1 font-medium hover:underline">Open in <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>
+                    <button type="button" className="flex items-center gap-1 font-medium hover:underline">Open in <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></button>
                     <div className="flex items-center space-x-2">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2-2h3"></path></svg>
