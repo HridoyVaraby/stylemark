@@ -6,6 +6,8 @@ import { useStore } from 'zustand'
 import { useThemeStore } from '@/store/useThemeStore'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs'
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './ui/accordion'
 import { Button } from './ui/button'
 import { Slider } from './ui/slider'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
@@ -43,7 +45,39 @@ const VIBE_PRESETS = {
   }
 }
 
+const ColorRow = ({ label, colorKey }: { label: string, colorKey: keyof import('@/store/useThemeStore').ColorPalette }) => {
+  const store = useThemeStore();
+  const isDark = store.meta.baseTheme === 'dark' || (store.meta.baseTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const activeColors = isDark ? store.darkColors : store.lightColors;
+  const updateFn = isDark ? store.setDarkColors : store.setLightColors;
+
+  return (
+    <div className="flex items-center gap-4 bg-background p-2 rounded-md border">
+      <input type="color" className="w-6 h-6 p-0 border-0 rounded cursor-pointer shrink-0" value={activeColors[colorKey]} onChange={(e) => updateFn({ [colorKey]: e.target.value })} />
+      <Label className="w-20">{label}</Label>
+      <Input value={activeColors[colorKey]} onChange={(e) => updateFn({ [colorKey]: e.target.value })} className="h-8 flex-1 font-mono text-xs border-none bg-muted/50" />
+    </div>
+  );
+}
+
 export function ControlCenter() {
+  const [currentVibe, setCurrentVibe] = useState<'luxury' | 'saas' | 'playful'>('luxury')
+  const [searchTerm, setSearchTerm] = useState('')
+  const COLOR_GROUPS = [
+    { label: 'PRIMARY', bgKey: 'primary', fgKey: 'primaryForeground' },
+    { label: 'SECONDARY', bgKey: 'secondary', fgKey: 'secondaryForeground' },
+    { label: 'ACCENT', bgKey: 'accent', fgKey: 'accentForeground' },
+    { label: 'BASE', bgKey: 'background', fgKey: 'foreground' },
+    { label: 'CARD', bgKey: 'card', fgKey: 'cardForeground' },
+    { label: 'POPOVER', bgKey: 'popover', fgKey: 'popoverForeground' },
+    { label: 'MUTED', bgKey: 'muted', fgKey: 'mutedForeground' },
+    { label: 'DESTRUCTIVE', bgKey: 'destructive', fgKey: 'destructiveForeground' },
+    { label: 'BORDER & INPUT', bgKey: 'border', fgKey: 'input' },
+  ] as const;
+
+  const filteredColorGroups = COLOR_GROUPS.filter(g => g.label.toLowerCase().includes(searchTerm.toLowerCase()));
+
+
 
   const pastStates = useStore(useThemeStore.temporal, (state) => state.pastStates)
   const futureStates = useStore(useThemeStore.temporal, (state) => state.futureStates)
@@ -109,33 +143,14 @@ export function ControlCenter() {
 
   const handleExportTailwindConfig = () => downloadBlob(generateTailwindConfig(useThemeStore.getState()), 'tailwind.config.js', 'application/javascript')
   const applyVibe = (vibe: 'luxury' | 'saas' | 'playful') => {
-    const presets = {
-      luxury: {
-        meta: { baseTheme: 'dark' as const, projectName: store.meta.projectName },
-        lightColors: { ...store.lightColors, primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', destructive: '#8b0000' },
-        darkColors: { ...store.darkColors, primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', destructive: '#8b0000' },
-        typography: { headingFont: 'Playfair Display', bodyFont: 'Lato', baseSize: 1, letterSpacing: 0, lineHeight: 1.5 },
-        geometry: { radius: '0rem', borderThickness: 1 },
-        effects: { shadowDepth: 'flat' as const, transitionEasing: 'ease-in-out' as const }
-      },
-      saas: {
-        meta: { baseTheme: 'light' as const, projectName: store.meta.projectName },
-        lightColors: { ...store.lightColors, primary: '#2563eb', secondary: '#f1f5f9', accent: '#3b82f6', background: '#ffffff', foreground: '#0f172a', destructive: '#ef4444' },
-        darkColors: { ...store.darkColors, primary: '#3b82f6', secondary: '#1e293b', accent: '#2563eb', background: '#020817', foreground: '#f8fafc', destructive: '#ef4444' },
-        typography: { headingFont: 'Inter', bodyFont: 'Inter', baseSize: 1, letterSpacing: 0, lineHeight: 1.5 },
-        geometry: { radius: '0.375rem', borderThickness: 1 },
-        effects: { shadowDepth: 'elevated' as const, transitionEasing: 'ease-out' as const }
-      },
-      playful: {
-        meta: { baseTheme: 'light' as const, projectName: store.meta.projectName },
-        lightColors: { ...store.lightColors, primary: '#ec4899', secondary: '#fdf2f8', accent: '#8b5cf6', background: '#ffffff', foreground: '#111827', destructive: '#ef4444' },
-        darkColors: { ...store.darkColors, primary: '#f472b6', secondary: '#4c1d95', accent: '#a78bfa', background: '#030712', foreground: '#f9fafb', destructive: '#ef4444' },
-        typography: { headingFont: 'Poppins', bodyFont: 'Poppins', baseSize: 1.125, letterSpacing: 0, lineHeight: 1.5 },
-        geometry: { radius: '9999px', borderThickness: 2 },
-        effects: { shadowDepth: 'floating' as const, transitionEasing: 'spring' as const }
-      }
-    }
-    store.applyPreset(presets[vibe])
+    const preset = VIBE_PRESETS[vibe]
+    setCurrentVibe(vibe)
+    store.applyPreset({
+      ...preset,
+      meta: { ...preset.meta, projectName: store.meta.projectName },
+      lightColors: { ...store.lightColors, ...preset.lightColors },
+      darkColors: { ...store.darkColors, ...preset.darkColors }
+    })
   }
 
   return (
@@ -154,150 +169,142 @@ export function ControlCenter() {
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-8">
-        {/* Global Settings */}
-        <section className="space-y-4">
-          <h2 className="font-semibold">Global Settings</h2>
-          <div className="space-y-2">
-            <Label>Project Name</Label>
-            <Input value={store.meta.projectName} onChange={(e) => store.setMeta({ projectName: e.target.value })} />
+                {/* Top bar with preset selector */}
+        <div className="flex items-center gap-2 mb-6">
+          <div className="flex gap-1 border rounded p-1">
+            <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: (store.meta.baseTheme === 'dark' ? store.darkColors : store.lightColors).destructive }}></div>
+            <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: (store.meta.baseTheme === 'dark' ? store.darkColors : store.lightColors).primary }}></div>
+            <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: (store.meta.baseTheme === 'dark' ? store.darkColors : store.lightColors).background }}></div>
           </div>
-          <div className="space-y-2">
-            <Label>Base Theme</Label>
-            <Select value={store.meta.baseTheme} onValueChange={(v: 'light' | 'dark' | 'system') => store.setMeta({ baseTheme: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                    <SelectItem value="system">System</SelectItem>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </section>
+          <Select value={currentVibe} onValueChange={(v) => applyVibe(v as "luxury" | "saas" | "playful")}>
+            <SelectTrigger className="w-[180px] border-none bg-transparent shadow-none font-semibold">
+              <SelectValue placeholder="Elegant Luxury" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="luxury">Elegant Luxury</SelectItem>
+              <SelectItem value="saas">Minimalist SaaS</SelectItem>
+              <SelectItem value="playful">Playful</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        {/* Vibe Presets */}
-        <section className="space-y-4">
-          <h2 className="font-semibold">Vibe Presets</h2>
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" onClick={() => applyVibe('luxury')}>Elegant Luxury</Button>
-            <Button variant="outline" onClick={() => applyVibe('saas')}>Minimalist SaaS</Button>
-            <Button variant="outline" className="col-span-2" onClick={() => applyVibe('playful')}>Playful</Button>
-          </div>
-        </section>
+        <Tabs defaultValue="colors" className="w-full">
+          <TabsList className="w-full justify-start border-b rounded-none bg-transparent h-auto p-0 space-x-6">
+            <TabsTrigger value="colors" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-2">Colors</TabsTrigger>
+            <TabsTrigger value="typography" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-2">Typography</TabsTrigger>
+            <TabsTrigger value="other" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-2">Other</TabsTrigger>
+            <div className="flex-1"></div>
+            <Button variant="ghost" size="sm" className="gap-2 h-8" onClick={handleExportMarkdown}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+              Generate
+            </Button>
+          </TabsList>
 
-        {/* Color System */}
-        <section className="space-y-4">
-          <h2 className="font-semibold">Color System</h2>
-          {Object.entries(store.meta.baseTheme === 'dark' ? store.darkColors : store.lightColors).map(([key, val]) => {
-            if (key.endsWith('Foreground')) return null;
-            return (
-            <div key={key} className="flex items-center gap-4">
-              <input
-                type="color"
-                className="w-10 h-10 p-0 border-0 rounded cursor-pointer shrink-0"
-                value={val as string}
-                onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ [key]: e.target.value }) : store.setLightColors({ [key]: e.target.value })}
-              />
-              <div className="flex-1">
-                <Label className="capitalize">{key}</Label>
-                <Input value={val as string} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ [key]: e.target.value }) : store.setLightColors({ [key]: e.target.value })} className="font-mono text-sm mt-1" />
+          <TabsContent value="colors" className="space-y-6 pt-6">
+            <div className="relative">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <Input placeholder="Search colors..." className="pl-9 bg-background" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            </div>
+
+            <Accordion type="multiple" defaultValue={['PRIMARY', 'SECONDARY']} className="w-full">
+              {filteredColorGroups.map(group => (
+                <AccordionItem key={group.label} value={group.label} className="border-none">
+                  <AccordionTrigger className="py-2 hover:no-underline text-xs font-semibold text-muted-foreground">{group.label}</AccordionTrigger>
+                  <AccordionContent className="space-y-2 pt-2">
+                    <ColorRow label="Background" colorKey={group.bgKey} />
+                    <ColorRow label="Foreground" colorKey={group.fgKey} />
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </TabsContent>
+
+          <TabsContent value="typography" className="space-y-6 pt-6">
+            <div className="space-y-4">
+              <h2 className="font-semibold">Typography</h2>
+              <div className="space-y-2">
+                <Label>Heading Font</Label>
+                <Select value={store.typography.headingFont} onValueChange={(v) => store.setTypography({ headingFont: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {GOOGLE_FONTS.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Body Font</Label>
+                <Select value={store.typography.bodyFont} onValueChange={(v) => store.setTypography({ bodyFont: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {GOOGLE_FONTS.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-            )
-          })}
-        </section>
+          </TabsContent>
 
-        {/* Typography */}
-        <section className="space-y-4">
-          <h2 className="font-semibold">Typography</h2>
-          <div className="space-y-2">
-            <Label>Heading Font</Label>
-            <Select value={store.typography.headingFont} onValueChange={(v) => store.setTypography({ headingFont: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {GOOGLE_FONTS.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Body Font</Label>
-            <Select value={store.typography.bodyFont} onValueChange={(v) => store.setTypography({ bodyFont: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {GOOGLE_FONTS.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-4 pt-2">
-            <div className="flex justify-between">
-              <Label>Base Size ({store.typography.baseSize}rem)</Label>
-            </div>
-            <Slider
-              value={[store.typography.baseSize]}
-              min={0.75} max={1.5} step={0.0625}
-              onValueChange={([v]) => store.setTypography({ baseSize: v })}
-            />
-          </div>
-          <div className="space-y-4 pt-2">
-            <div className="flex justify-between">
-              <Label>Letter Spacing ({store.typography.letterSpacing}em)</Label>
-            </div>
-            <Slider
-              value={[store.typography.letterSpacing]}
-              min={-0.1} max={0.2} step={0.01}
-              onValueChange={([v]) => store.setTypography({ letterSpacing: v })}
-            />
-          </div>
-          <div className="space-y-4 pt-2">
-            <div className="flex justify-between">
-              <Label>Line Height ({store.typography.lineHeight})</Label>
-            </div>
-            <Slider
-              value={[store.typography.lineHeight]}
-              min={1} max={2} step={0.05}
-              onValueChange={([v]) => store.setTypography({ lineHeight: v })}
-            />
-          </div>
-        </section>
+          <TabsContent value="other" className="space-y-6 pt-6">
+            {/* Global Settings */}
+            <section className="space-y-4">
+              <h2 className="font-semibold">Global Settings</h2>
+              <div className="space-y-2">
+                <Label>Project Name</Label>
+                <Input value={store.meta.projectName} onChange={(e) => store.setMeta({ projectName: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Base Theme</Label>
+                <Select value={store.meta.baseTheme} onValueChange={(v: 'light' | 'dark' | 'system') => store.setMeta({ baseTheme: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                        <SelectItem value="system">System</SelectItem>
+                    <SelectItem value="light">Light</SelectItem>
+                    <SelectItem value="dark">Dark</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </section>
 
-        {/* Geometry & Effects */}
-        <section className="space-y-4">
-          <h2 className="font-semibold">Geometry & Effects</h2>
-          <div className="space-y-2">
-            <Label>Border Radius</Label>
-            <Select value={store.geometry.radius} onValueChange={(v) => store.setGeometry({ radius: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0rem">None (0)</SelectItem>
-                <SelectItem value="0.125rem">Small (sm)</SelectItem>
-                <SelectItem value="0.375rem">Medium (md)</SelectItem>
-                <SelectItem value="0.5rem">Large (lg)</SelectItem>
-                <SelectItem value="0.75rem">Extra Large (xl)</SelectItem>
-                <SelectItem value="9999px">Full (Pill)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-4 pt-2">
-            <div className="flex justify-between">
-              <Label>Border Thickness ({store.geometry.borderThickness}px)</Label>
-            </div>
-            <Slider
-              value={[store.geometry.borderThickness]}
-              min={0} max={4} step={1}
-              onValueChange={([v]) => store.setGeometry({ borderThickness: v })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Shadow Depth</Label>
-            <Select value={store.effects.shadowDepth} onValueChange={(v: 'flat' | 'elevated' | 'floating') => store.setEffects({ shadowDepth: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="flat">Flat</SelectItem>
-                <SelectItem value="elevated">Elevated</SelectItem>
-                <SelectItem value="floating">Floating</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </section>
+            {/* Geometry & Effects */}
+            <section className="space-y-4">
+              <h2 className="font-semibold">Geometry & Effects</h2>
+              <div className="space-y-2">
+                <Label>Border Radius</Label>
+                <Select value={store.geometry.radius} onValueChange={(v) => store.setGeometry({ radius: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0rem">None (0)</SelectItem>
+                    <SelectItem value="0.125rem">Small (sm)</SelectItem>
+                    <SelectItem value="0.375rem">Medium (md)</SelectItem>
+                    <SelectItem value="0.5rem">Large (lg)</SelectItem>
+                    <SelectItem value="0.75rem">Extra Large (xl)</SelectItem>
+                    <SelectItem value="9999px">Full (Pill)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-4 pt-2">
+                <div className="flex justify-between">
+                  <Label>Border Thickness ({store.geometry.borderThickness}px)</Label>
+                </div>
+                <Slider
+                  value={[store.geometry.borderThickness]}
+                  min={0} max={4} step={1}
+                  onValueChange={([v]) => store.setGeometry({ borderThickness: v })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Shadow Depth</Label>
+                <Select value={store.effects.shadowDepth} onValueChange={(v: 'flat' | 'elevated' | 'floating') => store.setEffects({ shadowDepth: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="flat">Flat</SelectItem>
+                    <SelectItem value="elevated">Elevated</SelectItem>
+                    <SelectItem value="floating">Floating</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </section>
+          </TabsContent>
+        </Tabs>
       </div>
 
       <div className="p-6 border-t bg-background space-y-4">
