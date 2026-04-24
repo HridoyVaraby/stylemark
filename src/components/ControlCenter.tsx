@@ -6,6 +6,8 @@ import { useStore } from 'zustand'
 import { useThemeStore } from '@/store/useThemeStore'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs'
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './ui/accordion'
 import { Button } from './ui/button'
 import { Slider } from './ui/slider'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
@@ -16,7 +18,7 @@ import { Download, Upload, Share2, Copy, Check, Undo, Redo } from 'lucide-react'
 
 const GOOGLE_FONTS = ['Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Poppins', 'Playfair Display']
 
-const VIBE_PRESETS = {
+export const VIBE_PRESETS = {
   luxury: {
     meta: { baseTheme: 'dark' as const },
     lightColors: { primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', destructive: '#8b0000' },
@@ -154,150 +156,176 @@ export function ControlCenter() {
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-8">
-        {/* Global Settings */}
-        <section className="space-y-4">
-          <h2 className="font-semibold">Global Settings</h2>
-          <div className="space-y-2">
-            <Label>Project Name</Label>
-            <Input value={store.meta.projectName} onChange={(e) => store.setMeta({ projectName: e.target.value })} />
+                {/* Top bar with preset selector */}
+        <div className="flex items-center gap-2 mb-6">
+          <div className="flex gap-1 border rounded p-1">
+            <div className="w-4 h-4 bg-[#8b0000] rounded-sm"></div>
+            <div className="w-4 h-4 bg-[#d4af37] rounded-sm"></div>
+            <div className="w-4 h-4 bg-[#f5f5f5] rounded-sm"></div>
           </div>
-          <div className="space-y-2">
-            <Label>Base Theme</Label>
-            <Select value={store.meta.baseTheme} onValueChange={(v: 'light' | 'dark' | 'system') => store.setMeta({ baseTheme: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                    <SelectItem value="system">System</SelectItem>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </section>
+          <Select value="luxury" onValueChange={(v) => applyVibe(v as "luxury" | "saas" | "playful")}>
+            <SelectTrigger className="w-[180px] border-none bg-transparent shadow-none font-semibold">
+              <SelectValue placeholder="Elegant Luxury" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="luxury">Elegant Luxury</SelectItem>
+              <SelectItem value="saas">Minimalist SaaS</SelectItem>
+              <SelectItem value="playful">Playful</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        {/* Vibe Presets */}
-        <section className="space-y-4">
-          <h2 className="font-semibold">Vibe Presets</h2>
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" onClick={() => applyVibe('luxury')}>Elegant Luxury</Button>
-            <Button variant="outline" onClick={() => applyVibe('saas')}>Minimalist SaaS</Button>
-            <Button variant="outline" className="col-span-2" onClick={() => applyVibe('playful')}>Playful</Button>
-          </div>
-        </section>
+        <Tabs defaultValue="colors" className="w-full">
+          <TabsList className="w-full justify-start border-b rounded-none bg-transparent h-auto p-0 space-x-6">
+            <TabsTrigger value="colors" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-2">Colors</TabsTrigger>
+            <TabsTrigger value="typography" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-2">Typography</TabsTrigger>
+            <TabsTrigger value="other" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-2">Other</TabsTrigger>
+            <div className="flex-1"></div>
+            <Button variant="ghost" size="sm" className="gap-2 h-8">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+              Generate
+            </Button>
+          </TabsList>
 
-        {/* Color System */}
-        <section className="space-y-4">
-          <h2 className="font-semibold">Color System</h2>
-          {Object.entries(store.meta.baseTheme === 'dark' ? store.darkColors : store.lightColors).map(([key, val]) => {
-            if (key.endsWith('Foreground')) return null;
-            return (
-            <div key={key} className="flex items-center gap-4">
-              <input
-                type="color"
-                className="w-10 h-10 p-0 border-0 rounded cursor-pointer shrink-0"
-                value={val as string}
-                onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ [key]: e.target.value }) : store.setLightColors({ [key]: e.target.value })}
-              />
-              <div className="flex-1">
-                <Label className="capitalize">{key}</Label>
-                <Input value={val as string} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ [key]: e.target.value }) : store.setLightColors({ [key]: e.target.value })} className="font-mono text-sm mt-1" />
+          <TabsContent value="colors" className="space-y-6 pt-6">
+            <div className="relative">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <Input placeholder="Search colors..." className="pl-9 bg-background" />
+            </div>
+
+            <Accordion type="multiple" defaultValue={['primary', 'secondary']} className="w-full">
+              <AccordionItem value="primary" className="border-none">
+                <AccordionTrigger className="py-2 hover:no-underline text-xs font-semibold text-muted-foreground">PRIMARY</AccordionTrigger>
+                <AccordionContent className="space-y-2 pt-2">
+                  <div className="flex items-center gap-4 bg-background p-2 rounded-md border">
+                    <input type="color" className="w-6 h-6 p-0 border-0 rounded cursor-pointer shrink-0" value={store.meta.baseTheme === 'dark' ? store.darkColors.background : store.lightColors.background} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ background: e.target.value }) : store.setLightColors({ background: e.target.value })} />
+                    <Label className="w-20">Background</Label>
+                    <Input value={store.meta.baseTheme === 'dark' ? store.darkColors.background : store.lightColors.background} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ background: e.target.value }) : store.setLightColors({ background: e.target.value })} className="h-8 flex-1 font-mono text-xs border-none bg-muted/50" />
+                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></Button>
+                  </div>
+                  <div className="flex items-center gap-4 bg-background p-2 rounded-md border">
+                    <input type="color" className="w-6 h-6 p-0 border-0 rounded cursor-pointer shrink-0" value={store.meta.baseTheme === 'dark' ? store.darkColors.foreground : store.lightColors.foreground} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ foreground: e.target.value }) : store.setLightColors({ foreground: e.target.value })} />
+                    <Label className="w-20">Foreground</Label>
+                    <Input value={store.meta.baseTheme === 'dark' ? store.darkColors.foreground : store.lightColors.foreground} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ foreground: e.target.value }) : store.setLightColors({ foreground: e.target.value })} className="h-8 flex-1 font-mono text-xs border-none bg-muted/50" />
+                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></Button>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="secondary" className="border-none">
+                <AccordionTrigger className="py-2 hover:no-underline text-xs font-semibold text-muted-foreground">SECONDARY</AccordionTrigger>
+                <AccordionContent className="space-y-2 pt-2">
+                  <div className="flex items-center gap-4 bg-background p-2 rounded-md border">
+                    <input type="color" className="w-6 h-6 p-0 border-0 rounded cursor-pointer shrink-0" value={store.meta.baseTheme === 'dark' ? store.darkColors.secondary : store.lightColors.secondary} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ secondary: e.target.value }) : store.setLightColors({ secondary: e.target.value })} />
+                    <Label className="w-20">Background</Label>
+                    <Input value={store.meta.baseTheme === 'dark' ? store.darkColors.secondary : store.lightColors.secondary} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ secondary: e.target.value }) : store.setLightColors({ secondary: e.target.value })} className="h-8 flex-1 font-mono text-xs border-none bg-muted/50" />
+                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></Button>
+                  </div>
+                  <div className="flex items-center gap-4 bg-background p-2 rounded-md border">
+                    <input type="color" className="w-6 h-6 p-0 border-0 rounded cursor-pointer shrink-0" value={store.meta.baseTheme === 'dark' ? store.darkColors.secondaryForeground : store.lightColors.secondaryForeground} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ secondaryForeground: e.target.value }) : store.setLightColors({ secondaryForeground: e.target.value })} />
+                    <Label className="w-20">Foreground</Label>
+                    <Input value={store.meta.baseTheme === 'dark' ? store.darkColors.secondaryForeground : store.lightColors.secondaryForeground} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ secondaryForeground: e.target.value }) : store.setLightColors({ secondaryForeground: e.target.value })} className="h-8 flex-1 font-mono text-xs border-none bg-muted/50" />
+                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></Button>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {['ACCENT', 'BASE', 'CARD', 'POPOVER', 'MUTED', 'DESTRUCTIVE', 'BORDER & INPUT', 'CHART', 'SIDEBAR'].map(item => (
+                <AccordionItem key={item} value={item.toLowerCase()} className="border-none">
+                  <AccordionTrigger className="py-2 hover:no-underline text-xs font-semibold text-muted-foreground flex justify-between">
+                    <span>{item}</span>
+                  </AccordionTrigger>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </TabsContent>
+
+          <TabsContent value="typography" className="space-y-6 pt-6">
+            <div className="space-y-4">
+              <h2 className="font-semibold">Typography</h2>
+              <div className="space-y-2">
+                <Label>Heading Font</Label>
+                <Select value={store.typography.headingFont} onValueChange={(v) => store.setTypography({ headingFont: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {GOOGLE_FONTS.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Body Font</Label>
+                <Select value={store.typography.bodyFont} onValueChange={(v) => store.setTypography({ bodyFont: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {GOOGLE_FONTS.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-            )
-          })}
-        </section>
+          </TabsContent>
 
-        {/* Typography */}
-        <section className="space-y-4">
-          <h2 className="font-semibold">Typography</h2>
-          <div className="space-y-2">
-            <Label>Heading Font</Label>
-            <Select value={store.typography.headingFont} onValueChange={(v) => store.setTypography({ headingFont: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {GOOGLE_FONTS.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Body Font</Label>
-            <Select value={store.typography.bodyFont} onValueChange={(v) => store.setTypography({ bodyFont: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {GOOGLE_FONTS.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-4 pt-2">
-            <div className="flex justify-between">
-              <Label>Base Size ({store.typography.baseSize}rem)</Label>
-            </div>
-            <Slider
-              value={[store.typography.baseSize]}
-              min={0.75} max={1.5} step={0.0625}
-              onValueChange={([v]) => store.setTypography({ baseSize: v })}
-            />
-          </div>
-          <div className="space-y-4 pt-2">
-            <div className="flex justify-between">
-              <Label>Letter Spacing ({store.typography.letterSpacing}em)</Label>
-            </div>
-            <Slider
-              value={[store.typography.letterSpacing]}
-              min={-0.1} max={0.2} step={0.01}
-              onValueChange={([v]) => store.setTypography({ letterSpacing: v })}
-            />
-          </div>
-          <div className="space-y-4 pt-2">
-            <div className="flex justify-between">
-              <Label>Line Height ({store.typography.lineHeight})</Label>
-            </div>
-            <Slider
-              value={[store.typography.lineHeight]}
-              min={1} max={2} step={0.05}
-              onValueChange={([v]) => store.setTypography({ lineHeight: v })}
-            />
-          </div>
-        </section>
+          <TabsContent value="other" className="space-y-6 pt-6">
+            {/* Global Settings */}
+            <section className="space-y-4">
+              <h2 className="font-semibold">Global Settings</h2>
+              <div className="space-y-2">
+                <Label>Project Name</Label>
+                <Input value={store.meta.projectName} onChange={(e) => store.setMeta({ projectName: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Base Theme</Label>
+                <Select value={store.meta.baseTheme} onValueChange={(v: 'light' | 'dark' | 'system') => store.setMeta({ baseTheme: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                        <SelectItem value="system">System</SelectItem>
+                    <SelectItem value="light">Light</SelectItem>
+                    <SelectItem value="dark">Dark</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </section>
 
-        {/* Geometry & Effects */}
-        <section className="space-y-4">
-          <h2 className="font-semibold">Geometry & Effects</h2>
-          <div className="space-y-2">
-            <Label>Border Radius</Label>
-            <Select value={store.geometry.radius} onValueChange={(v) => store.setGeometry({ radius: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0rem">None (0)</SelectItem>
-                <SelectItem value="0.125rem">Small (sm)</SelectItem>
-                <SelectItem value="0.375rem">Medium (md)</SelectItem>
-                <SelectItem value="0.5rem">Large (lg)</SelectItem>
-                <SelectItem value="0.75rem">Extra Large (xl)</SelectItem>
-                <SelectItem value="9999px">Full (Pill)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-4 pt-2">
-            <div className="flex justify-between">
-              <Label>Border Thickness ({store.geometry.borderThickness}px)</Label>
-            </div>
-            <Slider
-              value={[store.geometry.borderThickness]}
-              min={0} max={4} step={1}
-              onValueChange={([v]) => store.setGeometry({ borderThickness: v })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Shadow Depth</Label>
-            <Select value={store.effects.shadowDepth} onValueChange={(v: 'flat' | 'elevated' | 'floating') => store.setEffects({ shadowDepth: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="flat">Flat</SelectItem>
-                <SelectItem value="elevated">Elevated</SelectItem>
-                <SelectItem value="floating">Floating</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </section>
+            {/* Geometry & Effects */}
+            <section className="space-y-4">
+              <h2 className="font-semibold">Geometry & Effects</h2>
+              <div className="space-y-2">
+                <Label>Border Radius</Label>
+                <Select value={store.geometry.radius} onValueChange={(v) => store.setGeometry({ radius: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0rem">None (0)</SelectItem>
+                    <SelectItem value="0.125rem">Small (sm)</SelectItem>
+                    <SelectItem value="0.375rem">Medium (md)</SelectItem>
+                    <SelectItem value="0.5rem">Large (lg)</SelectItem>
+                    <SelectItem value="0.75rem">Extra Large (xl)</SelectItem>
+                    <SelectItem value="9999px">Full (Pill)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-4 pt-2">
+                <div className="flex justify-between">
+                  <Label>Border Thickness ({store.geometry.borderThickness}px)</Label>
+                </div>
+                <Slider
+                  value={[store.geometry.borderThickness]}
+                  min={0} max={4} step={1}
+                  onValueChange={([v]) => store.setGeometry({ borderThickness: v })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Shadow Depth</Label>
+                <Select value={store.effects.shadowDepth} onValueChange={(v: 'flat' | 'elevated' | 'floating') => store.setEffects({ shadowDepth: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="flat">Flat</SelectItem>
+                    <SelectItem value="elevated">Elevated</SelectItem>
+                    <SelectItem value="floating">Floating</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </section>
+          </TabsContent>
+        </Tabs>
       </div>
 
       <div className="p-6 border-t bg-background space-y-4">
