@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useThemeStore } from '@/store/useThemeStore'
+import { cn } from '@/lib/utils'
 import { hexToHsl } from '@/utils/color'
 import { Button } from './ui/button'
 import { Card, CardContent } from './ui/card'
@@ -79,15 +80,19 @@ export function PreviewDashboard() {
       {/* Top Bar Controls */}
       <div className="h-14 border-b border-slate-700 bg-slate-800 flex items-center justify-between px-4 text-white shrink-0">
         <div className="flex space-x-2 bg-slate-900 rounded-md p-1">
-          <button onClick={() => setViewport('mobile')} className={`p-1.5 rounded ${viewport === 'mobile' ? 'bg-slate-700' : 'hover:bg-slate-800'}`}>
-            <Smartphone className="w-4 h-4" />
-          </button>
-          <button onClick={() => setViewport('tablet')} className={`p-1.5 rounded ${viewport === 'tablet' ? 'bg-slate-700' : 'hover:bg-slate-800'}`}>
-            <Tablet className="w-4 h-4" />
-          </button>
-          <button onClick={() => setViewport('desktop')} className={`p-1.5 rounded ${viewport === 'desktop' ? 'bg-slate-700' : 'hover:bg-slate-800'}`}>
-            <Laptop className="w-4 h-4" />
-          </button>
+          {([
+            { key: 'mobile', icon: Smartphone },
+            { key: 'tablet', icon: Tablet },
+            { key: 'desktop', icon: Laptop }
+          ] as const).map(({ key, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => setViewport(key as "mobile" | "tablet" | "desktop")}
+              className={cn('p-1.5 rounded', viewport === key ? 'bg-slate-700' : 'hover:bg-slate-800')}
+            >
+              <Icon className="w-4 h-4" />
+            </button>
+          ))}
         </div>
         <div className="text-sm font-medium">Live Preview</div>
         <Button variant="secondary" size="sm" onClick={handleToggleDark}>
@@ -111,7 +116,7 @@ export function PreviewDashboard() {
                 </div>
 
                 <div className="space-y-1">
-                  <Button variant="destructive" className="w-full justify-start gap-2 bg-[#9b2c2c] text-white hover:bg-[#8b2c2c]">
+                  <Button variant="destructive" className="w-full justify-start gap-2 bg-[var(--destructive)] text-[var(--destructive-foreground)] hover:bg-[var(--destructive)] hover:opacity-90">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
                     Quick Create
                   </Button>
@@ -189,12 +194,12 @@ export function PreviewDashboard() {
               </div>
 
               {/* Main Content Area */}
-              <div className="flex-1 flex flex-col min-w-0 overflow-y-auto bg-[#f8f8f8]">
+              <div className="flex-1 flex flex-col min-w-0 overflow-y-auto bg-[var(--background)]">
                 <div className="border-b px-6 py-4 flex items-center justify-between bg-background">
                   <div className="flex space-x-6 text-sm font-medium">
                     <a href="#" className="text-muted-foreground hover:text-foreground">Custom</a>
                     <a href="#" className="text-muted-foreground hover:text-foreground">Cards</a>
-                    <a href="#" className="text-[#a67c00] bg-accent/30 rounded-full px-3 py-1 font-semibold">Dashboard</a>
+                    <a href="#" className="text-[var(--accent)] bg-accent/30 rounded-full px-3 py-1 font-semibold">Dashboard</a>
                     <a href="#" className="text-muted-foreground hover:text-foreground">Mail</a>
                     <a href="#" className="text-muted-foreground hover:text-foreground">Pricing</a>
                     <a href="#" className="text-muted-foreground hover:text-foreground">Color Palette</a>
@@ -304,7 +309,7 @@ export function PreviewDashboard() {
                         </div>
                         <div className="flex border rounded-md overflow-hidden text-sm">
                           <button className="px-3 py-1 bg-background hover:bg-muted/50">Last 3 months</button>
-                          <button className="px-3 py-1 bg-accent/30 font-medium border-x text-[#8b0000]">Last 30 days</button>
+                          <button className="px-3 py-1 bg-accent/30 font-medium border-x text-[var(--destructive)]">Last 30 days</button>
                           <button className="px-3 py-1 bg-background hover:bg-muted/50">Last 7 days</button>
                         </div>
                       </div>
@@ -314,20 +319,20 @@ export function PreviewDashboard() {
                         <svg viewBox="0 0 800 300" className="w-full h-full preserve-3d" preserveAspectRatio="none">
                           <defs>
                             <linearGradient id="chartGradient1" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#d4af37" stopOpacity="0.4" />
-                              <stop offset="100%" stopColor="#d4af37" stopOpacity="0.01" />
+                              <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.4" />
+                              <stop offset="100%" stopColor="var(--accent)" stopOpacity="0.01" />
                             </linearGradient>
                             <linearGradient id="chartGradient2" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#8b0000" stopOpacity="0.4" />
-                              <stop offset="100%" stopColor="#8b0000" stopOpacity="0.01" />
+                              <stop offset="0%" stopColor="var(--destructive)" stopOpacity="0.4" />
+                              <stop offset="100%" stopColor="var(--destructive)" stopOpacity="0.01" />
                             </linearGradient>
                           </defs>
                           {/* Smooth curved path matching image closely */}
                           <path d="M0,250 C40,250 50,180 80,180 C110,180 120,260 160,260 C200,260 210,140 240,140 C270,140 280,240 320,240 C360,240 370,120 400,120 C430,120 440,260 480,260 C520,260 530,150 560,150 C590,150 600,230 640,230 C680,230 690,100 720,100 C750,100 770,200 800,200 L800,300 L0,300 Z" fill="url(#chartGradient2)" stroke="none" />
-                          <path d="M0,250 C40,250 50,180 80,180 C110,180 120,260 160,260 C200,260 210,140 240,140 C270,140 280,240 320,240 C360,240 370,120 400,120 C430,120 440,260 480,260 C520,260 530,150 560,150 C590,150 600,230 640,230 C680,230 690,100 720,100 C750,100 770,200 800,200" fill="none" stroke="#8b0000" strokeWidth="3" />
+                          <path d="M0,250 C40,250 50,180 80,180 C110,180 120,260 160,260 C200,260 210,140 240,140 C270,140 280,240 320,240 C360,240 370,120 400,120 C430,120 440,260 480,260 C520,260 530,150 560,150 C590,150 600,230 640,230 C680,230 690,100 720,100 C750,100 770,200 800,200" fill="none" stroke="var(--destructive)" strokeWidth="3" />
 
                           <path d="M0,270 C30,270 40,210 70,210 C100,210 110,280 150,280 C190,280 200,170 230,170 C260,170 270,260 310,260 C350,260 360,150 390,150 C420,150 430,280 470,280 C510,280 520,180 550,180 C580,180 590,250 630,250 C670,250 680,130 710,130 C740,130 760,230 800,230 L800,300 L0,300 Z" fill="url(#chartGradient1)" stroke="none" />
-                          <path d="M0,270 C30,270 40,210 70,210 C100,210 110,280 150,280 C190,280 200,170 230,170 C260,170 270,260 310,260 C350,260 360,150 390,150 C420,150 430,280 470,280 C510,280 520,180 550,180 C580,180 590,250 630,250 C670,250 680,130 710,130 C740,130 760,230 800,230" fill="none" stroke="#d4af37" strokeWidth="2" />
+                          <path d="M0,270 C30,270 40,210 70,210 C100,210 110,280 150,280 C190,280 200,170 230,170 C260,170 270,260 310,260 C350,260 360,150 390,150 C420,150 430,280 470,280 C510,280 520,180 550,180 C580,180 590,250 630,250 C670,250 680,130 710,130 C740,130 760,230 800,230" fill="none" stroke="var(--accent)" strokeWidth="2" />
                         </svg>
                       </div>
                       <div className="flex justify-between px-8 py-2 text-xs text-muted-foreground mt-2">

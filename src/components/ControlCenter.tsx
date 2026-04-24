@@ -46,6 +46,36 @@ export const VIBE_PRESETS = {
 }
 
 export function ControlCenter() {
+  const [currentVibe, setCurrentVibe] = useState<'luxury' | 'saas' | 'playful'>('luxury')
+  const [searchTerm, setSearchTerm] = useState('')
+  const COLOR_GROUPS = [
+    { label: 'PRIMARY', bgKey: 'primary', fgKey: 'primaryForeground' },
+    { label: 'SECONDARY', bgKey: 'secondary', fgKey: 'secondaryForeground' },
+    { label: 'ACCENT', bgKey: 'accent', fgKey: 'accentForeground' },
+    { label: 'BASE', bgKey: 'background', fgKey: 'foreground' },
+    { label: 'CARD', bgKey: 'card', fgKey: 'cardForeground' },
+    { label: 'POPOVER', bgKey: 'popover', fgKey: 'popoverForeground' },
+    { label: 'MUTED', bgKey: 'muted', fgKey: 'mutedForeground' },
+    { label: 'DESTRUCTIVE', bgKey: 'destructive', fgKey: 'destructiveForeground' },
+    { label: 'BORDER & INPUT', bgKey: 'border', fgKey: 'input' },
+  ] as const;
+
+  const filteredColorGroups = COLOR_GROUPS.filter(g => g.label.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  const ColorRow = ({ label, colorKey }: { label: string, colorKey: keyof typeof store.lightColors }) => {
+    const isDark = store.meta.baseTheme === 'dark' || (store.meta.baseTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const activeColors = isDark ? store.darkColors : store.lightColors;
+    const updateFn = isDark ? store.setDarkColors : store.setLightColors;
+
+    return (
+      <div className="flex items-center gap-4 bg-background p-2 rounded-md border">
+        <input type="color" className="w-6 h-6 p-0 border-0 rounded cursor-pointer shrink-0" value={activeColors[colorKey]} onChange={(e) => updateFn({ [colorKey]: e.target.value })} />
+        <Label className="w-20">{label}</Label>
+        <Input value={activeColors[colorKey]} onChange={(e) => updateFn({ [colorKey]: e.target.value })} className="h-8 flex-1 font-mono text-xs border-none bg-muted/50" />
+      </div>
+    );
+  }
+
 
   const pastStates = useStore(useThemeStore.temporal, (state) => state.pastStates)
   const futureStates = useStore(useThemeStore.temporal, (state) => state.futureStates)
@@ -111,33 +141,14 @@ export function ControlCenter() {
 
   const handleExportTailwindConfig = () => downloadBlob(generateTailwindConfig(useThemeStore.getState()), 'tailwind.config.js', 'application/javascript')
   const applyVibe = (vibe: 'luxury' | 'saas' | 'playful') => {
-    const presets = {
-      luxury: {
-        meta: { baseTheme: 'dark' as const, projectName: store.meta.projectName },
-        lightColors: { ...store.lightColors, primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', destructive: '#8b0000' },
-        darkColors: { ...store.darkColors, primary: '#d4af37', secondary: '#1f1f1f', accent: '#a67c00', background: '#0a0a0a', foreground: '#f5f5f5', destructive: '#8b0000' },
-        typography: { headingFont: 'Playfair Display', bodyFont: 'Lato', baseSize: 1, letterSpacing: 0, lineHeight: 1.5 },
-        geometry: { radius: '0rem', borderThickness: 1 },
-        effects: { shadowDepth: 'flat' as const, transitionEasing: 'ease-in-out' as const }
-      },
-      saas: {
-        meta: { baseTheme: 'light' as const, projectName: store.meta.projectName },
-        lightColors: { ...store.lightColors, primary: '#2563eb', secondary: '#f1f5f9', accent: '#3b82f6', background: '#ffffff', foreground: '#0f172a', destructive: '#ef4444' },
-        darkColors: { ...store.darkColors, primary: '#3b82f6', secondary: '#1e293b', accent: '#2563eb', background: '#020817', foreground: '#f8fafc', destructive: '#ef4444' },
-        typography: { headingFont: 'Inter', bodyFont: 'Inter', baseSize: 1, letterSpacing: 0, lineHeight: 1.5 },
-        geometry: { radius: '0.375rem', borderThickness: 1 },
-        effects: { shadowDepth: 'elevated' as const, transitionEasing: 'ease-out' as const }
-      },
-      playful: {
-        meta: { baseTheme: 'light' as const, projectName: store.meta.projectName },
-        lightColors: { ...store.lightColors, primary: '#ec4899', secondary: '#fdf2f8', accent: '#8b5cf6', background: '#ffffff', foreground: '#111827', destructive: '#ef4444' },
-        darkColors: { ...store.darkColors, primary: '#f472b6', secondary: '#4c1d95', accent: '#a78bfa', background: '#030712', foreground: '#f9fafb', destructive: '#ef4444' },
-        typography: { headingFont: 'Poppins', bodyFont: 'Poppins', baseSize: 1.125, letterSpacing: 0, lineHeight: 1.5 },
-        geometry: { radius: '9999px', borderThickness: 2 },
-        effects: { shadowDepth: 'floating' as const, transitionEasing: 'spring' as const }
-      }
-    }
-    store.applyPreset(presets[vibe])
+    const preset = VIBE_PRESETS[vibe]
+    setCurrentVibe(vibe)
+    store.applyPreset({
+      ...preset,
+      meta: { ...preset.meta, projectName: store.meta.projectName },
+      lightColors: { ...store.lightColors, ...preset.lightColors },
+      darkColors: { ...store.darkColors, ...preset.darkColors }
+    })
   }
 
   return (
@@ -159,11 +170,11 @@ export function ControlCenter() {
                 {/* Top bar with preset selector */}
         <div className="flex items-center gap-2 mb-6">
           <div className="flex gap-1 border rounded p-1">
-            <div className="w-4 h-4 bg-[#8b0000] rounded-sm"></div>
-            <div className="w-4 h-4 bg-[#d4af37] rounded-sm"></div>
-            <div className="w-4 h-4 bg-[#f5f5f5] rounded-sm"></div>
+            <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: (store.meta.baseTheme === 'dark' ? store.darkColors : store.lightColors).destructive }}></div>
+            <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: (store.meta.baseTheme === 'dark' ? store.darkColors : store.lightColors).primary }}></div>
+            <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: (store.meta.baseTheme === 'dark' ? store.darkColors : store.lightColors).background }}></div>
           </div>
-          <Select value="luxury" onValueChange={(v) => applyVibe(v as "luxury" | "saas" | "playful")}>
+          <Select value={currentVibe} onValueChange={(v) => applyVibe(v as "luxury" | "saas" | "playful")}>
             <SelectTrigger className="w-[180px] border-none bg-transparent shadow-none font-semibold">
               <SelectValue placeholder="Elegant Luxury" />
             </SelectTrigger>
@@ -181,7 +192,7 @@ export function ControlCenter() {
             <TabsTrigger value="typography" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-2">Typography</TabsTrigger>
             <TabsTrigger value="other" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 py-2">Other</TabsTrigger>
             <div className="flex-1"></div>
-            <Button variant="ghost" size="sm" className="gap-2 h-8">
+            <Button variant="ghost" size="sm" className="gap-2 h-8" onClick={handleExportMarkdown}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
               Generate
             </Button>
@@ -190,51 +201,17 @@ export function ControlCenter() {
           <TabsContent value="colors" className="space-y-6 pt-6">
             <div className="relative">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              <Input placeholder="Search colors..." className="pl-9 bg-background" />
+              <Input placeholder="Search colors..." className="pl-9 bg-background" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
             </div>
 
-            <Accordion type="multiple" defaultValue={['primary', 'secondary']} className="w-full">
-              <AccordionItem value="primary" className="border-none">
-                <AccordionTrigger className="py-2 hover:no-underline text-xs font-semibold text-muted-foreground">PRIMARY</AccordionTrigger>
-                <AccordionContent className="space-y-2 pt-2">
-                  <div className="flex items-center gap-4 bg-background p-2 rounded-md border">
-                    <input type="color" className="w-6 h-6 p-0 border-0 rounded cursor-pointer shrink-0" value={store.meta.baseTheme === 'dark' ? store.darkColors.background : store.lightColors.background} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ background: e.target.value }) : store.setLightColors({ background: e.target.value })} />
-                    <Label className="w-20">Background</Label>
-                    <Input value={store.meta.baseTheme === 'dark' ? store.darkColors.background : store.lightColors.background} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ background: e.target.value }) : store.setLightColors({ background: e.target.value })} className="h-8 flex-1 font-mono text-xs border-none bg-muted/50" />
-                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></Button>
-                  </div>
-                  <div className="flex items-center gap-4 bg-background p-2 rounded-md border">
-                    <input type="color" className="w-6 h-6 p-0 border-0 rounded cursor-pointer shrink-0" value={store.meta.baseTheme === 'dark' ? store.darkColors.foreground : store.lightColors.foreground} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ foreground: e.target.value }) : store.setLightColors({ foreground: e.target.value })} />
-                    <Label className="w-20">Foreground</Label>
-                    <Input value={store.meta.baseTheme === 'dark' ? store.darkColors.foreground : store.lightColors.foreground} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ foreground: e.target.value }) : store.setLightColors({ foreground: e.target.value })} className="h-8 flex-1 font-mono text-xs border-none bg-muted/50" />
-                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></Button>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="secondary" className="border-none">
-                <AccordionTrigger className="py-2 hover:no-underline text-xs font-semibold text-muted-foreground">SECONDARY</AccordionTrigger>
-                <AccordionContent className="space-y-2 pt-2">
-                  <div className="flex items-center gap-4 bg-background p-2 rounded-md border">
-                    <input type="color" className="w-6 h-6 p-0 border-0 rounded cursor-pointer shrink-0" value={store.meta.baseTheme === 'dark' ? store.darkColors.secondary : store.lightColors.secondary} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ secondary: e.target.value }) : store.setLightColors({ secondary: e.target.value })} />
-                    <Label className="w-20">Background</Label>
-                    <Input value={store.meta.baseTheme === 'dark' ? store.darkColors.secondary : store.lightColors.secondary} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ secondary: e.target.value }) : store.setLightColors({ secondary: e.target.value })} className="h-8 flex-1 font-mono text-xs border-none bg-muted/50" />
-                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></Button>
-                  </div>
-                  <div className="flex items-center gap-4 bg-background p-2 rounded-md border">
-                    <input type="color" className="w-6 h-6 p-0 border-0 rounded cursor-pointer shrink-0" value={store.meta.baseTheme === 'dark' ? store.darkColors.secondaryForeground : store.lightColors.secondaryForeground} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ secondaryForeground: e.target.value }) : store.setLightColors({ secondaryForeground: e.target.value })} />
-                    <Label className="w-20">Foreground</Label>
-                    <Input value={store.meta.baseTheme === 'dark' ? store.darkColors.secondaryForeground : store.lightColors.secondaryForeground} onChange={(e) => store.meta.baseTheme === 'dark' ? store.setDarkColors({ secondaryForeground: e.target.value }) : store.setLightColors({ secondaryForeground: e.target.value })} className="h-8 flex-1 font-mono text-xs border-none bg-muted/50" />
-                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></Button>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-
-              {['ACCENT', 'BASE', 'CARD', 'POPOVER', 'MUTED', 'DESTRUCTIVE', 'BORDER & INPUT', 'CHART', 'SIDEBAR'].map(item => (
-                <AccordionItem key={item} value={item.toLowerCase()} className="border-none">
-                  <AccordionTrigger className="py-2 hover:no-underline text-xs font-semibold text-muted-foreground flex justify-between">
-                    <span>{item}</span>
-                  </AccordionTrigger>
+            <Accordion type="multiple" defaultValue={['PRIMARY', 'SECONDARY']} className="w-full">
+              {filteredColorGroups.map(group => (
+                <AccordionItem key={group.label} value={group.label} className="border-none">
+                  <AccordionTrigger className="py-2 hover:no-underline text-xs font-semibold text-muted-foreground">{group.label}</AccordionTrigger>
+                  <AccordionContent className="space-y-2 pt-2">
+                    <ColorRow label="Background" colorKey={group.bgKey} />
+                    <ColorRow label="Foreground" colorKey={group.fgKey} />
+                  </AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
