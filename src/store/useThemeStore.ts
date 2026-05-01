@@ -143,6 +143,8 @@ const defaultState: Omit<ThemeState, 'setMeta' | 'setLightColors' | 'setDarkColo
   },
 }
 
+const BASE_COLOR_KEYS = new Set(['primary', 'secondary', 'accent', 'destructive', 'success', 'warning', 'card', 'popover'])
+
 export const useThemeStore = create<ThemeState>()(
   temporal(
     persist(
@@ -153,7 +155,7 @@ export const useThemeStore = create<ThemeState>()(
         const newColors = { ...state.lightColors, ...colors }
         // Auto-generate foregrounds if a base color was updated
         for (const key in colors) {
-          if (!key.endsWith('Foreground') && ['primary', 'secondary', 'accent', 'destructive', 'success', 'warning', 'card', 'popover'].includes(key)) {
+          if (!key.endsWith('Foreground') && BASE_COLOR_KEYS.has(key)) {
             const fgKey = `${key}Foreground` as keyof ColorPalette
             newColors[fgKey] = getContrastForeground(newColors[key as keyof ColorPalette])
           } else if (key === 'background') {
@@ -165,7 +167,7 @@ export const useThemeStore = create<ThemeState>()(
       setDarkColors: (colors) => set((state) => {
         const newColors = { ...state.darkColors, ...colors }
         for (const key in colors) {
-          if (!key.endsWith('Foreground') && ['primary', 'secondary', 'accent', 'destructive', 'success', 'warning', 'card', 'popover'].includes(key)) {
+          if (!key.endsWith('Foreground') && BASE_COLOR_KEYS.has(key)) {
             const fgKey = `${key}Foreground` as keyof ColorPalette
             newColors[fgKey] = getContrastForeground(newColors[key as keyof ColorPalette])
           } else if (key === 'background') {
