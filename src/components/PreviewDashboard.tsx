@@ -62,8 +62,8 @@ export function PreviewDashboard() {
       link.rel = 'stylesheet'
       document.head.appendChild(link)
     }
-    const headingUrl = store.typography.headingFont.replace(/ /g, '+')
-    const bodyUrl = store.typography.bodyFont.replace(/ /g, '+')
+    const headingUrl = encodeURIComponent(store.typography.headingFont)
+    const bodyUrl = encodeURIComponent(store.typography.bodyFont)
     link.href = `https://fonts.googleapis.com/css2?family=${headingUrl}:wght@400;700&family=${bodyUrl}:wght@400;500&display=swap`
   }, [store.typography.headingFont, store.typography.bodyFont])
 
