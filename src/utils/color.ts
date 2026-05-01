@@ -38,7 +38,7 @@ export function hexToHsl(hex: string): string {
   return `${h} ${s}% ${l}%`
 }
 
-export function getLuminance(hex: string): number {
+function getLuminance(hex: string): number {
   if (!hex) return 0
   hex = hex.replace(/^#/, '')
   if (hex.length === 3) {
